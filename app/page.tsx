@@ -1,6 +1,6 @@
-import Logo from "@/components/Logo";
-import UrlShortenerContainer from "@/components/UrlShortenerContainer";
-import Stats from "@/components/Stats";
+import Logo from "@/components/ui/Logo";
+import UrlShortenerContainer from "@/components/ui/UrlShortenerContainer";
+import Stats from "@/components/ui/Stats";
 
 export default function Home() {
   return (
