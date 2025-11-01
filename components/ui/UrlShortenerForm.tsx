@@ -29,7 +29,7 @@ export default function UrlShortenerForm({
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         required
-        className="flex-1"
+        className="flex-1 border-primary"
       />
       <Button type="submit" disabled={isLoading}>
         {isLoading ? "Converting..." : "Convert"}

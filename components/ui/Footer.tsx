@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { TbBrandGithubFilled } from "react-icons/tb";
-
 import { MdEmail } from "react-icons/md";
 
 export default function Footer() {
