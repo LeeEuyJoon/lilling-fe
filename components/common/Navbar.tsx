@@ -19,8 +19,8 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="border-b border-border/40 bg-transparent backdrop-blur-sm">
-      <div className="container mx-auto max-w-6xl px-8 py-3">
+    <nav className="bg-transparent">
+      <div className="container mx-auto max-w-6xl px-8 py-4">
         <div className="flex items-center justify-between">
           {/* Left: Lilling text link */}
           <Link
