@@ -2,15 +2,18 @@
 
 import MyUrlsPageHeader from "./_components/MyUrlsPageHeader";
 import UrlList from "./_components/UrlList";
+import DeleteConfirmDialog from "./_components/DeleteConfirmDialog";
 import { dummyUrls, UrlItem } from "@/lib/dummyData";
 import { Pagination } from "@/components/shadcn/pagination";
 import { useState, useMemo } from "react";
+import { toast } from "sonner";
 
 const PAGE_SIZE = 10;
 
 export default function MyUrlsPage() {
   const [urls, setUrls] = useState<UrlItem[]>(dummyUrls);
   const [currentPage, setCurrentPage] = useState(1);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // 페이지네이션 계산
   const totalPages = Math.ceil(urls.length / PAGE_SIZE);
@@ -21,22 +24,40 @@ export default function MyUrlsPage() {
     [urls, startIndex, endIndex]
   );
 
+  // 삭제할 URL 찾기
+  const deletingUrl = useMemo(
+    () => urls.find((url) => url.id === deletingId),
+    [urls, deletingId]
+  );
+
   const handleCopy = (shortUrl: string) => {
     navigator.clipboard.writeText(`https://${shortUrl}`);
+    toast.success("Copied to clipboard!");
   };
 
   const handleEdit = (id: string, description: string) => {
     // URL 리스트에서 해당 URL의 description 업데이트
     setUrls((prevUrls) =>
-      prevUrls.map((url) =>
-        url.id === id ? { ...url, description } : url
-      )
+      prevUrls.map((url) => (url.id === id ? { ...url, description } : url))
     );
   };
 
   const handleDelete = (id: string) => {
-    // TODO: Implement delete functionality
-    console.log("Deleting URL:", id);
+    setDeletingId(id);
+  };
+
+  const confirmDelete = () => {
+    if (!deletingId) return;
+
+    // URL 리스트에서 삭제
+    setUrls((prevUrls) => prevUrls.filter((url) => url.id !== deletingId));
+    setDeletingId(null);
+
+    // 삭제 후 현재 페이지가 비어있으면 이전 페이지로
+    const newTotalPages = Math.ceil((urls.length - 1) / PAGE_SIZE);
+    if (currentPage > newTotalPages && newTotalPages > 0) {
+      setCurrentPage(newTotalPages);
+    }
   };
 
   const handlePageChange = (page: number) => {
@@ -58,6 +79,14 @@ export default function MyUrlsPage() {
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}
+      />
+
+      {/* 삭제 확인 모달 */}
+      <DeleteConfirmDialog
+        open={!!deletingId}
+        onOpenChange={(open) => !open && setDeletingId(null)}
+        onConfirm={confirmDelete}
+        shortUrl={deletingUrl?.shortUrl}
       />
     </main>
   );
