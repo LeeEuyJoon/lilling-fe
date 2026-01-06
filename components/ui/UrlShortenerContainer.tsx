@@ -22,6 +22,7 @@ export default function UrlShortenerContainer() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ originalUrl: url }),
+          credentials: "include",
         }
       );
 
