@@ -1,13 +1,15 @@
 "use client";
 
 import { Button } from "@/components/shadcn/button";
+import { Input } from "@/components/shadcn/input";
 import { UrlItem } from "@/lib/dummyData";
 import { Copy, ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 interface UrlCardProps {
   url: UrlItem;
   onCopy: (shortUrl: string) => void;
-  onEdit: (id: string) => void;
+  onEdit: (id: string, description: string) => void;
   onDelete: (id: string) => void;
 }
 
@@ -17,6 +19,9 @@ export default function UrlCard({
   onEdit,
   onDelete,
 }: UrlCardProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [description, setDescription] = useState(url.description || "");
+
   const extractDomain = (urlString: string) => {
     try {
       return new URL(urlString).hostname;
@@ -28,6 +33,25 @@ export default function UrlCard({
   const getFaviconUrl = (urlString: string) => {
     const domain = extractDomain(urlString);
     return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+  };
+
+  const handleEditClick = () => {
+    setDescription(url.description || "");
+    setIsEditing(true);
+  };
+
+  const handleSave = () => {
+    onEdit(url.id, description);
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSave();
+    } else if (e.key === "Escape") {
+      setDescription(url.description || "");
+      setIsEditing(false);
+    }
   };
 
   return (
@@ -81,31 +105,45 @@ export default function UrlCard({
             {url.originalUrl}
           </p>
 
-          {/* Description - Clickable area with Edit button */}
-          <div
-            className="mt-2 mb-3 p-2 border border-dashed rounded bg-muted/30 text-sm cursor-pointer hover:border-primary transition-colors relative group"
-            onClick={() => onEdit(url.id)}
-            title="Click to edit description"
-          >
-            {url.description ? (
-              <p className="pr-8">{url.description}</p>
-            ) : (
-              <p className="text-muted-foreground italic pr-8">
-                Click to add description...
-              </p>
-            )}
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="absolute right-1 top-1"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(url.id);
-              }}
+          {/* Description - Inline edit */}
+          {isEditing ? (
+            <div className="mt-2 mb-3">
+              <Input
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onBlur={handleSave}
+                placeholder="Enter description..."
+                className="text-sm"
+                autoFocus
+              />
+            </div>
+          ) : (
+            <div
+              className="mt-2 mb-3 p-2 border border-dashed rounded bg-muted/30 text-sm cursor-pointer hover:border-primary transition-colors relative group"
+              onClick={handleEditClick}
+              title="Click to edit description"
             >
-              <Pencil className="size-3" />
-            </Button>
-          </div>
+              {url.description ? (
+                <p className="pr-8">{url.description}</p>
+              ) : (
+                <p className="text-muted-foreground italic pr-8">
+                  Click to add description...
+                </p>
+              )}
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="absolute right-1 top-1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEditClick();
+                }}
+              >
+                <Pencil className="size-3" />
+              </Button>
+            </div>
+          )}
 
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <span>{url.clickCount} clicks</span>

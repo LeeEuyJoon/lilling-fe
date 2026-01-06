@@ -2,32 +2,36 @@
 
 import MyUrlsPageHeader from "./_components/MyUrlsPageHeader";
 import UrlList from "./_components/UrlList";
-import { dummyUrls } from "@/lib/dummyData";
+import { dummyUrls, UrlItem } from "@/lib/dummyData";
 import { Pagination } from "@/components/shadcn/pagination";
 import { useState, useMemo } from "react";
 
 const PAGE_SIZE = 10;
 
 export default function MyUrlsPage() {
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [urls, setUrls] = useState<UrlItem[]>(dummyUrls);
   const [currentPage, setCurrentPage] = useState(1);
 
   // 페이지네이션 계산
-  const totalPages = Math.ceil(dummyUrls.length / PAGE_SIZE);
+  const totalPages = Math.ceil(urls.length / PAGE_SIZE);
   const startIndex = (currentPage - 1) * PAGE_SIZE;
   const endIndex = startIndex + PAGE_SIZE;
   const currentUrls = useMemo(
-    () => dummyUrls.slice(startIndex, endIndex),
-    [startIndex, endIndex]
+    () => urls.slice(startIndex, endIndex),
+    [urls, startIndex, endIndex]
   );
 
   const handleCopy = (shortUrl: string) => {
     navigator.clipboard.writeText(`https://${shortUrl}`);
   };
 
-  const handleEdit = (id: string) => {
-    setEditingId(id);
-    // TODO: Open edit modal
+  const handleEdit = (id: string, description: string) => {
+    // URL 리스트에서 해당 URL의 description 업데이트
+    setUrls((prevUrls) =>
+      prevUrls.map((url) =>
+        url.id === id ? { ...url, description } : url
+      )
+    );
   };
 
   const handleDelete = (id: string) => {

@@ -6,7 +6,7 @@ import UrlCard from "./UrlCard";
 interface UrlListProps {
   urls: UrlItem[];
   onCopy: (shortUrl: string) => void;
-  onEdit: (id: string) => void;
+  onEdit: (id: string, description: string) => void;
   onDelete: (id: string) => void;
 }
 
