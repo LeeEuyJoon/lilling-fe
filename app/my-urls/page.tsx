@@ -2,6 +2,7 @@
 
 import MyUrlsPageHeader from "./_components/MyUrlsPageHeader";
 import UrlList from "./_components/UrlList";
+import EmptyState from "./_components/EmptyState";
 import DeleteConfirmDialog from "./_components/DeleteConfirmDialog";
 import { dummyUrls, UrlItem } from "@/lib/dummyData";
 import { Pagination } from "@/components/shadcn/pagination";
@@ -69,17 +70,24 @@ export default function MyUrlsPage() {
   return (
     <main className="container mx-auto max-w-4xl p-8">
       <MyUrlsPageHeader />
-      <UrlList
-        urls={currentUrls}
-        onCopy={handleCopy}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+
+      {urls.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <>
+          <UrlList
+            urls={currentUrls}
+            onCopy={handleCopy}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
+      )}
 
       {/* 삭제 확인 모달 */}
       <DeleteConfirmDialog
