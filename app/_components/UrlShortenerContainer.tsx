@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import UrlShortenerForm from "@/components/ui/UrlShortenerForm";
-import ResultDialog from "@/components/ui/ResultDialog";
+import UrlShortenerForm from "./UrlShortenerForm";
+import ResultDialog from "./ResultDialog";
 
 export default function UrlShortenerContainer() {
   const [originalUrl, setOriginalUrl] = useState("");

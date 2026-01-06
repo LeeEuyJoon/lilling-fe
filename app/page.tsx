@@ -1,7 +1,7 @@
-import Logo from "@/components/ui/Logo";
-import UrlShortenerContainer from "@/components/ui/UrlShortenerContainer";
-import FakeStat from "@/components/ui/FakeStat";
-import MyUrlsButton from "@/components/ui/MyUrlsButton";
+import Logo from "@/components/common/Logo";
+import UrlShortenerContainer from "./_components/UrlShortenerContainer";
+import FakeStat from "./_components/FakeStat";
+import MyUrlsButton from "./_components/MyUrlsButton";
 
 export default function Home() {
   return (

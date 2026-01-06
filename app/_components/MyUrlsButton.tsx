@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "../shadcn/button";
+import { Button } from "@/components/shadcn/button";
 import { Link2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
