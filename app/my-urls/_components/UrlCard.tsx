@@ -147,7 +147,14 @@ export default function UrlCard({
 
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <span>{url.clickCount} clicks</span>
-            <span>Created {new Date(url.createdAt).toLocaleDateString()}</span>
+            <span>
+              Created{" "}
+              {new Date(url.createdAt).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </span>
           </div>
         </div>
       </div>
