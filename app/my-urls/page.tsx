@@ -1,12 +1,25 @@
 "use client";
 
 import { Button } from "@/components/shadcn/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/shadcn/dialog";
+import { Input } from "@/components/shadcn/input";
 import { dummyUrls } from "@/lib/dummyData";
-import { Copy, ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { Copy, ExternalLink, Link2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 export default function MyUrlsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isAddExistingModalOpen, setIsAddExistingModalOpen] = useState(false);
+  const [urlInput, setUrlInput] = useState("");
+  const [existingShortCode, setExistingShortCode] = useState("");
 
   const extractDomain = (url: string) => {
     try {
@@ -25,6 +38,20 @@ export default function MyUrlsPage() {
     navigator.clipboard.writeText(`https://${shortUrl}`);
   };
 
+  const handleShorten = () => {
+    // TODO: Call shorten API
+    console.log("Shortening URL:", urlInput);
+    setIsCreateModalOpen(false);
+    setUrlInput("");
+  };
+
+  const handleAddExisting = () => {
+    // TODO: Call add existing URL API
+    console.log("Adding existing short code:", existingShortCode);
+    setIsAddExistingModalOpen(false);
+    setExistingShortCode("");
+  };
+
   return (
     <main className="container mx-auto max-w-4xl p-8">
       {/* Header */}
@@ -33,8 +60,98 @@ export default function MyUrlsPage() {
           <h1 className="text-3xl font-bold mb-2">My URLs</h1>
           <p className="text-muted-foreground">Manage your shortened URLs</p>
         </div>
-        <Button variant="default">Add Existing URL</Button>
+        <div className="flex gap-2">
+          <Button
+            variant="default"
+            onClick={() => setIsCreateModalOpen(true)}
+          >
+            <Plus className="size-4" />
+            Create New
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setIsAddExistingModalOpen(true)}
+          >
+            Add Existing URL
+          </Button>
+        </div>
       </div>
+
+      {/* Create New URL Modal */}
+      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Short URL</DialogTitle>
+            <DialogDescription>
+              Enter a long URL to shorten it
+            </DialogDescription>
+          </DialogHeader>
+          <div className="relative">
+            <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-muted-foreground" />
+            <Input
+              type="url"
+              placeholder="https://example.com/very/long/url"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && urlInput.trim()) {
+                  handleShorten();
+                }
+              }}
+              className="pl-10"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleShorten} disabled={!urlInput.trim()}>
+              Shorten URL
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Existing URL Modal */}
+      <Dialog open={isAddExistingModalOpen} onOpenChange={setIsAddExistingModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Existing Short URL</DialogTitle>
+            <DialogDescription>
+              Enter the short code of an existing shortened URL to add it to your list
+            </DialogDescription>
+          </DialogHeader>
+          <div className="relative">
+            <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="abc123"
+              value={existingShortCode}
+              onChange={(e) => setExistingShortCode(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && existingShortCode.trim()) {
+                  handleAddExisting();
+                }
+              }}
+              className="pl-10"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsAddExistingModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleAddExisting} disabled={!existingShortCode.trim()}>
+              Add URL
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* URL List */}
       <div className="space-y-4">
