@@ -57,7 +57,7 @@ export default function UrlCard({
   return (
     <div className="border rounded-lg p-4 bg-card shadow-sm hover:shadow-md transition-all">
       <div className="flex items-start gap-4 relative">
-        {/* Top-right Actions */}
+        {/* 우측 상단 액션 버튼 */}
         <div className="absolute top-0 right-0 flex items-center gap-1">
           <Button
             variant="ghost"
@@ -87,7 +87,7 @@ export default function UrlCard({
           }}
         />
 
-        {/* URL Info */}
+        {/* URL 정보 */}
         <div className="flex-1 min-w-0 pr-20">
           <div className="flex items-center gap-2 mb-1">
             <a
@@ -105,7 +105,7 @@ export default function UrlCard({
             {url.originalUrl}
           </p>
 
-          {/* Description - Inline edit */}
+          {/* 설명 - 인라인 편집 */}
           {isEditing ? (
             <div className="mt-2 mb-3">
               <Input

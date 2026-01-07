@@ -67,9 +67,17 @@ export default function MyUrlsPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleAddUrl = (url: UrlItem) => {
+    // 리스트에 URL 추가
+    setUrls((prevUrls) => [url, ...prevUrls]);
+    // 첫 페이지로 이동 (새로 추가된 URL 보여주기)
+    setCurrentPage(1);
+    toast.success("URL added successfully!");
+  };
+
   return (
     <main className="container mx-auto max-w-4xl p-8">
-      <MyUrlsPageHeader />
+      <MyUrlsPageHeader onAddUrl={handleAddUrl} />
 
       {urls.length === 0 ? (
         <EmptyState />
