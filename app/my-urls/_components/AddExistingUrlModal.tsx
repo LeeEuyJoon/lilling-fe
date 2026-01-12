@@ -49,14 +49,17 @@ export default function AddExistingUrlModal({
     try {
       const response = await api.myUrls.verify(shortCode);
 
-      if (response.exists && !response.hasOwner && response.urlInfo) {
-        setVerifiedUrl(response.urlInfo);
+      if (response.valid) {
+        // valid=true means URL exists and has no owner
+        setVerifiedUrl({
+          shortUrl: response.shortUrl,
+          originalUrl: response.originalUrl,
+          clickCount: response.clickCount,
+        });
         setVerificationState("success");
-      } else if (response.hasOwner) {
-        setErrorMessage("This URL already has an owner");
-        setVerificationState("error");
       } else {
-        setErrorMessage("This URL doesn't exist");
+        // valid=false means URL doesn't exist or already has owner
+        setErrorMessage("This URL doesn't exist or already has an owner");
         setVerificationState("error");
       }
     } catch (error) {

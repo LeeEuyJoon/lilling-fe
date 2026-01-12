@@ -21,17 +21,15 @@ export interface MyUrlsListResponse {
 }
 
 export interface VerifyUrlResponse {
-  exists: boolean;
-  hasOwner: boolean;
-  urlInfo?: {
-    shortUrl: string;
-    originalUrl: string;
-    clickCount: number;
-  };
+  valid: boolean;
+  originalUrl: string;
+  shortUrl: string;
+  clickCount: number;
+  createdAt: string;
 }
 
 export interface AuthMeResponse {
-  authenticated: boolean;
+  isAuthenticated: boolean;
   memberId?: number;
   email?: string;
 }

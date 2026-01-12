@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(response);
 
       // 로그인 후 리다이렉트 처리 (한 번만 실행)
-      if (response.authenticated && !hasRedirected.current) {
+      if (response.isAuthenticated && !hasRedirected.current) {
         const redirectUrl = localStorage.getItem("redirect_after_login");
         if (redirectUrl) {
           hasRedirected.current = true;
@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = {
     user,
     isLoading,
-    isAuthenticated: user?.authenticated === true,
+    isAuthenticated: user?.isAuthenticated === true,
     login,
     logout,
     refreshAuth,
