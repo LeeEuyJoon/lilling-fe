@@ -33,6 +33,7 @@ export default function MyUrlsActions({ onAddUrl }: MyUrlsActionsProps) {
       <CreateUrlModal
         open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
+        onSuccess={onAddUrl}
       />
       <AddExistingUrlModal
         open={isAddExistingModalOpen}

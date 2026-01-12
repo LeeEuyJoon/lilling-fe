@@ -19,11 +19,13 @@ import ResultDialog from "@/app/_components/ResultDialog";
 interface CreateUrlModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
 export default function CreateUrlModal({
   open,
   onOpenChange,
+  onSuccess,
 }: CreateUrlModalProps) {
   const [urlInput, setUrlInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -39,6 +41,7 @@ export default function CreateUrlModal({
       setShortUrl(response.shortUrl);
       onOpenChange(false); // Close input modal
       setIsResultOpen(true); // Open result modal
+      onSuccess?.(); // Refresh URL list
     } catch (error) {
       toast.error("Failed to shorten URL. Please try again.");
       console.error("Shorten error:", error);
