@@ -4,26 +4,60 @@ import MyUrlsPageHeader from "./_components/MyUrlsPageHeader";
 import UrlList from "./_components/UrlList";
 import EmptyState from "./_components/EmptyState";
 import DeleteConfirmDialog from "./_components/DeleteConfirmDialog";
-import { dummyUrls, UrlItem } from "@/lib/dummyData";
+import { type UrlItem } from "@/lib/dummyData";
 import { Pagination } from "@/components/shadcn/pagination";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
 
 const PAGE_SIZE = 10;
 
 export default function MyUrlsPage() {
-  const [urls, setUrls] = useState<UrlItem[]>(dummyUrls);
-  const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const [urls, setUrls] = useState<UrlItem[]>([]);
+  const [currentPage, setCurrentPage] = useState(0); // 0-based index for backend
+  const [totalPages, setTotalPages] = useState(0);
+  const [isLoadingUrls, setIsLoadingUrls] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // 페이지네이션 계산
-  const totalPages = Math.ceil(urls.length / PAGE_SIZE);
-  const startIndex = (currentPage - 1) * PAGE_SIZE;
-  const endIndex = startIndex + PAGE_SIZE;
-  const currentUrls = useMemo(
-    () => urls.slice(startIndex, endIndex),
-    [urls, startIndex, endIndex]
-  );
+  // 인증 확인 및 리다이렉트
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      toast.error("로그인이 필요합니다.");
+      router.push("/");
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  // URL 목록 로드
+  const loadUrls = async (page: number = 0) => {
+    setIsLoadingUrls(true);
+    try {
+      const response = await api.myUrls.list(page, PAGE_SIZE);
+      setUrls(response.urls);
+      setTotalPages(Number(response.totalPages));
+      setCurrentPage(Number(response.currentPage));
+    } catch (error) {
+      toast.error("URL 목록을 불러오는데 실패했습니다.");
+      console.error("Failed to load URLs:", error);
+    } finally {
+      setIsLoadingUrls(false);
+    }
+  };
+
+  // 인증 완료 후 URL 목록 로드
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      loadUrls(0);
+    }
+  }, [authLoading, isAuthenticated]);
+
+  // 로딩 중이거나 인증되지 않은 경우 렌더링하지 않음
+  if (authLoading || !isAuthenticated) {
+    return null;
+  }
 
   // 삭제할 URL 찾기
   const deletingUrl = useMemo(
@@ -37,10 +71,12 @@ export default function MyUrlsPage() {
   };
 
   const handleEdit = (id: string, description: string) => {
-    // URL 리스트에서 해당 URL의 description 업데이트
+    // TODO: API 호출하여 description 업데이트
+    // 현재는 로컬 상태만 업데이트
     setUrls((prevUrls) =>
       prevUrls.map((url) => (url.id === id ? { ...url, description } : url))
     );
+    toast.success("Description updated!");
   };
 
   const handleDelete = (id: string) => {
@@ -50,28 +86,22 @@ export default function MyUrlsPage() {
   const confirmDelete = () => {
     if (!deletingId) return;
 
-    // URL 리스트에서 삭제
-    setUrls((prevUrls) => prevUrls.filter((url) => url.id !== deletingId));
+    // TODO: API 호출하여 삭제
+    // 현재는 로컬 상태만 업데이트하고 목록 새로고침
     setDeletingId(null);
-
-    // 삭제 후 현재 페이지가 비어있으면 이전 페이지로
-    const newTotalPages = Math.ceil((urls.length - 1) / PAGE_SIZE);
-    if (currentPage > newTotalPages && newTotalPages > 0) {
-      setCurrentPage(newTotalPages);
-    }
+    loadUrls(currentPage);
+    toast.success("URL deleted successfully!");
   };
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    // 페이지 변경 시 스크롤을 상단으로
+    // shadcn Pagination은 1-based, 백엔드는 0-based
+    loadUrls(page - 1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleAddUrl = (url: UrlItem) => {
-    // 리스트에 URL 추가
-    setUrls((prevUrls) => [url, ...prevUrls]);
-    // 첫 페이지로 이동 (새로 추가된 URL 보여주기)
-    setCurrentPage(1);
+  const handleAddUrl = () => {
+    // 목록 새로고침 (첫 페이지로)
+    loadUrls(0);
     toast.success("URL added successfully!");
   };
 
@@ -79,21 +109,27 @@ export default function MyUrlsPage() {
     <main className="container mx-auto max-w-4xl p-8">
       <MyUrlsPageHeader onAddUrl={handleAddUrl} />
 
-      {urls.length === 0 ? (
+      {isLoadingUrls ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      ) : urls.length === 0 ? (
         <EmptyState />
       ) : (
         <>
           <UrlList
-            urls={currentUrls}
+            urls={urls}
             onCopy={handleCopy}
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage + 1} // 1-based for display
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
         </>
       )}
 

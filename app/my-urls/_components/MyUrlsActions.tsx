@@ -5,10 +5,9 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import AddExistingUrlModal from "./AddExistingUrlModal";
 import CreateUrlModal from "./CreateUrlModal";
-import { UrlItem } from "@/lib/dummyData";
 
 interface MyUrlsActionsProps {
-  onAddUrl: (url: UrlItem) => void;
+  onAddUrl: () => void;
 }
 
 export default function MyUrlsActions({ onAddUrl }: MyUrlsActionsProps) {

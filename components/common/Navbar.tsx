@@ -1,22 +1,14 @@
 "use client";
 
-import { Button } from "@/components/shadcn/button";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
   const isHome = pathname === "/";
 
   // 홈페이지에서는 네비게이션 바 숨김
   if (isHome) return null;
-
-  const handleLogout = () => {
-    // TODO: 로그아웃 API 호출
-    // 쿠키 삭제 등
-    router.push("/");
-  };
 
   return (
     <nav className="bg-transparent">
@@ -30,10 +22,7 @@ export default function Navbar() {
             Lilling
           </Link>
 
-          {/* Right: Logout button */}
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
-            Logout
-          </Button>
+          {/* TODO: 로그아웃 버튼은 백엔드 엔드포인트 추가 후 구현 */}
         </div>
       </div>
     </nav>

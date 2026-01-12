@@ -3,12 +3,18 @@
 import { Button } from "@/components/shadcn/button";
 import { Link2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
 
 export default function MyUrlsButton() {
   const router = useRouter();
+  const { isAuthenticated, isLoading, login } = useAuth();
 
   const handleClick = () => {
-    router.push("/my-urls");
+    if (isAuthenticated) {
+      router.push("/my-urls");
+    } else {
+      login();
+    }
   };
 
   return (
@@ -17,10 +23,11 @@ export default function MyUrlsButton() {
         onClick={handleClick}
         variant="outline"
         size="lg"
+        disabled={isLoading}
         className="text-base font-semibold shadow-sm hover:shadow-md transition-all"
       >
         <Link2 className="size-5" />
-        My URLs
+        {isLoading ? "확인 중..." : "My URLs"}
       </Button>
     </div>
   );

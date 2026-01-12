@@ -1,8 +1,7 @@
 import MyUrlsActions from "./MyUrlsActions";
-import { UrlItem } from "@/lib/dummyData";
 
 interface MyUrlsPageHeaderProps {
-  onAddUrl: (url: UrlItem) => void;
+  onAddUrl: () => void;
 }
 
 export default function MyUrlsPageHeader({ onAddUrl }: MyUrlsPageHeaderProps) {

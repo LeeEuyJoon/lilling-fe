@@ -12,14 +12,21 @@ import {
 import { Input } from "@/components/shadcn/input";
 import { Link2, Loader2, CheckCircle, XCircle, ExternalLink } from "lucide-react";
 import { useState } from "react";
-import { UrlItem } from "@/lib/dummyData";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
-type VerificationState = "idle" | "verifying" | "success" | "error";
+type VerificationState = "idle" | "verifying" | "success" | "error" | "claiming";
+
+interface VerifiedUrlInfo {
+  shortUrl: string;
+  originalUrl: string;
+  clickCount: number;
+}
 
 interface AddExistingUrlModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAdd: (url: UrlItem) => void;
+  onAdd: () => void;
 }
 
 export default function AddExistingUrlModal({
@@ -29,7 +36,7 @@ export default function AddExistingUrlModal({
 }: AddExistingUrlModalProps) {
   const [shortCode, setShortCode] = useState("");
   const [verificationState, setVerificationState] = useState<VerificationState>("idle");
-  const [verifiedUrl, setVerifiedUrl] = useState<UrlItem | null>(null);
+  const [verifiedUrl, setVerifiedUrl] = useState<VerifiedUrlInfo | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleVerify = async () => {
@@ -37,37 +44,42 @@ export default function AddExistingUrlModal({
 
     setVerificationState("verifying");
     setErrorMessage("");
+    setVerifiedUrl(null);
 
-    // TODO: 실제 API 호출로 교체 필요
-    // API 호출 시뮬레이션
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const response = await api.myUrls.verify(shortCode);
 
-    // 목 검증 로직
-    const mockUrl: UrlItem = {
-      id: Date.now().toString(),
-      shortUrl: `lill.ing/${shortCode}`,
-      originalUrl: "https://example.com/very/long/url/path",
-      description: "",
-      createdAt: new Date().toISOString(),
-      clickCount: 42,
-    };
-
-    // 성공/실패 시뮬레이션
-    const isValid = Math.random() > 0.3; // 데모용 70% 성공률
-
-    if (isValid) {
-      setVerifiedUrl(mockUrl);
-      setVerificationState("success");
-    } else {
-      setErrorMessage("This URL doesn't exist or doesn't belong to you");
+      if (response.exists && !response.hasOwner && response.urlInfo) {
+        setVerifiedUrl(response.urlInfo);
+        setVerificationState("success");
+      } else if (response.hasOwner) {
+        setErrorMessage("This URL already has an owner");
+        setVerificationState("error");
+      } else {
+        setErrorMessage("This URL doesn't exist");
+        setVerificationState("error");
+      }
+    } catch (error) {
+      setErrorMessage("Failed to verify URL. Please try again.");
       setVerificationState("error");
+      console.error("Verify error:", error);
     }
   };
 
-  const handleAdd = () => {
-    if (verifiedUrl) {
-      onAdd(verifiedUrl);
+  const handleAdd = async () => {
+    if (!verifiedUrl) return;
+
+    setVerificationState("claiming");
+
+    try {
+      await api.myUrls.claim(shortCode);
+      toast.success("URL claimed successfully!");
+      onAdd();
       handleClose();
+    } catch (error) {
+      toast.error("Failed to claim URL. Please try again.");
+      setVerificationState("success");
+      console.error("Claim error:", error);
     }
   };
 
@@ -146,17 +158,6 @@ export default function AddExistingUrlModal({
                   </div>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span>{verifiedUrl.clickCount} clicks</span>
-                    <span>
-                      Created{" "}
-                      {new Date(verifiedUrl.createdAt).toLocaleDateString(
-                        "en-US",
-                        {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        }
-                      )}
-                    </span>
                   </div>
                 </div>
               </div>
@@ -176,11 +177,20 @@ export default function AddExistingUrlModal({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
+          <Button
+            variant="outline"
+            onClick={handleClose}
+            disabled={verificationState === "claiming"}
+          >
             Cancel
           </Button>
           {verificationState === "success" ? (
             <Button onClick={handleAdd}>Add to List</Button>
+          ) : verificationState === "claiming" ? (
+            <Button disabled>
+              <Loader2 className="size-4 animate-spin mr-2" />
+              Adding...
+            </Button>
           ) : verificationState === "error" ? (
             <Button onClick={() => setVerificationState("idle")} variant="outline">
               Try Again
