@@ -23,6 +23,7 @@ export default function MyUrlsButton() {
       <Button
         variant="outline"
         size="lg"
+        onClick={handleClick}
         className="border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground shadow-lg hover:shadow-xl transition-all"
       >
         <Link2 className="size-5" />
