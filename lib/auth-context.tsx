@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { api, type AuthMeResponse } from "./api";
 
 interface AuthContextType {
@@ -15,20 +16,23 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [user, setUser] = useState<AuthMeResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const hasRedirected = useRef(false);
 
   const checkAuth = async () => {
     try {
       const response = await api.auth.me();
       setUser(response);
 
-      // 로그인 후 리다이렉트 처리
-      if (response.authenticated) {
+      // 로그인 후 리다이렉트 처리 (한 번만 실행)
+      if (response.authenticated && !hasRedirected.current) {
         const redirectUrl = localStorage.getItem("redirect_after_login");
         if (redirectUrl) {
+          hasRedirected.current = true;
           localStorage.removeItem("redirect_after_login");
-          window.location.href = redirectUrl;
+          router.push(redirectUrl);
         }
       }
     } catch (error) {
