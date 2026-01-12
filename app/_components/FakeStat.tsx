@@ -26,11 +26,11 @@ export default function FakeStats() {
     <div className="flex gap-8 justify-center mt-18">
       <div className="text-center">
         <AnimatedCounter end={urlCount} />{" "}
-        <p className="text-sm text-muted-foreground">단축된 URL</p>
+        <p className="text-sm text-muted-foreground">shortend urls</p>
       </div>
       <div className="text-center">
         <AnimatedCounter end={clickCount} />
-        <p className="text-sm text-muted-foreground">총 클릭</p>
+        <p className="text-sm text-muted-foreground">total clicks</p>
       </div>
     </div>
   );

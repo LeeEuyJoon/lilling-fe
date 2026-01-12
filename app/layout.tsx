@@ -32,7 +32,7 @@ export default function RootLayout({
         className={`
           ${geistSans.variable} ${geistMono.variable}
           antialiased flex flex-col min-h-screen
-          bg-linear-to-br from-gray-200 via-white to-navy-200
+          bg-gray-100
           `}
       >
         <AuthProvider>

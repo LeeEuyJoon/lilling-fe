@@ -21,11 +21,9 @@ export default function MyUrlsButton() {
   return (
     <div className="flex justify-center mt-16 mb-4">
       <Button
-        onClick={handleClick}
         variant="outline"
         size="lg"
-        disabled={isLoading}
-        className="text-base font-semibold shadow-sm hover:shadow-md transition-all"
+        className="border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground shadow-lg hover:shadow-xl transition-all"
       >
         <Link2 className="size-5" />
         {isLoading ? "확인 중..." : "My URLs"}
