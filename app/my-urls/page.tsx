@@ -54,16 +54,16 @@ export default function MyUrlsPage() {
     }
   }, [authLoading, isAuthenticated]);
 
-  // 로딩 중이거나 인증되지 않은 경우 렌더링하지 않음
-  if (authLoading || !isAuthenticated) {
-    return null;
-  }
-
   // 삭제할 URL 찾기
   const deletingUrl = useMemo(
     () => urls.find((url) => url.id === deletingId),
     [urls, deletingId]
   );
+
+  // 로딩 중이거나 인증되지 않은 경우 렌더링하지 않음
+  if (authLoading || !isAuthenticated) {
+    return null;
+  }
 
   const handleCopy = (shortUrl: string) => {
     navigator.clipboard.writeText(`https://${shortUrl}`);
