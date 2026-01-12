@@ -10,12 +10,23 @@ import {
   DialogTitle,
 } from "@/components/shadcn/dialog";
 import { Input } from "@/components/shadcn/input";
-import { Link2, Loader2, CheckCircle, XCircle, ExternalLink } from "lucide-react";
+import {
+  Link2,
+  Loader2,
+  CheckCircle,
+  XCircle,
+  ExternalLink,
+} from "lucide-react";
 import { useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 
-type VerificationState = "idle" | "verifying" | "success" | "error" | "claiming";
+type VerificationState =
+  | "idle"
+  | "verifying"
+  | "success"
+  | "error"
+  | "claiming";
 
 interface VerifiedUrlInfo {
   shortUrl: string;
@@ -35,7 +46,8 @@ export default function AddExistingUrlModal({
   onAdd,
 }: AddExistingUrlModalProps) {
   const [shortCode, setShortCode] = useState("");
-  const [verificationState, setVerificationState] = useState<VerificationState>("idle");
+  const [verificationState, setVerificationState] =
+    useState<VerificationState>("idle");
   const [verifiedUrl, setVerifiedUrl] = useState<VerifiedUrlInfo | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -49,17 +61,24 @@ export default function AddExistingUrlModal({
     try {
       const response = await api.myUrls.verify(shortCode);
 
-      if (response.valid) {
-        // valid=true means URL exists and has no owner
+      if (response.status === "OK") {
         setVerifiedUrl({
           shortUrl: response.shortUrl,
           originalUrl: response.originalUrl,
           clickCount: response.clickCount,
         });
         setVerificationState("success");
+      } else if (response.status === "ALREADY_OWNED") {
+        setErrorMessage("This URL already has an owner");
+        setVerificationState("error");
+      } else if (response.status === "NOT_FOUND") {
+        setErrorMessage("This URL doesn't exist");
+        setVerificationState("error");
+      } else if (response.status === "INVALID_FORMAT") {
+        setErrorMessage("Invalid URL format");
+        setVerificationState("error");
       } else {
-        // valid=false means URL doesn't exist or already has owner
-        setErrorMessage("This URL doesn't exist or already has an owner");
+        setErrorMessage("Unable to verify URL");
         setVerificationState("error");
       }
     } catch (error) {
@@ -116,7 +135,11 @@ export default function AddExistingUrlModal({
                 value={shortCode}
                 onChange={(e) => setShortCode(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && shortCode.trim() && verificationState === "idle") {
+                  if (
+                    e.key === "Enter" &&
+                    shortCode.trim() &&
+                    verificationState === "idle"
+                  ) {
                     handleVerify();
                   }
                 }}
@@ -195,7 +218,10 @@ export default function AddExistingUrlModal({
               Adding...
             </Button>
           ) : verificationState === "error" ? (
-            <Button onClick={() => setVerificationState("idle")} variant="outline">
+            <Button
+              onClick={() => setVerificationState("idle")}
+              variant="outline"
+            >
               Try Again
             </Button>
           ) : null}

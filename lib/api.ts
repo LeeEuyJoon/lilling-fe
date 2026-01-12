@@ -21,6 +21,7 @@ export interface MyUrlsListResponse {
 }
 
 export interface VerifyUrlResponse {
+  status: "OK" | "NOT_FOUND" | "ALREADY_OWNED" | "INVALID_FORMAT";
   valid: boolean;
   originalUrl: string;
   shortUrl: string;
