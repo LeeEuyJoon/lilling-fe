@@ -13,7 +13,8 @@ export default function MyUrlsButton() {
     if (isAuthenticated) {
       router.push("/my-urls");
     } else {
-      login();
+      // 로그인 후 /my-urls로 리다이렉트하도록 설정
+      login("/my-urls");
     }
   };
 

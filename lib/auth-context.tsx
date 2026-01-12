@@ -7,7 +7,7 @@ interface AuthContextType {
   user: AuthMeResponse | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: () => void;
+  login: (redirectTo?: string) => void;
   logout: () => void;
   refreshAuth: () => Promise<void>;
 }
@@ -22,6 +22,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await api.auth.me();
       setUser(response);
+
+      // 로그인 후 리다이렉트 처리
+      if (response.authenticated) {
+        const redirectUrl = localStorage.getItem("redirect_after_login");
+        if (redirectUrl) {
+          localStorage.removeItem("redirect_after_login");
+          window.location.href = redirectUrl;
+        }
+      }
     } catch (error) {
       setUser(null);
     } finally {
@@ -33,7 +42,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, []);
 
-  const login = () => {
+  const login = (redirectTo?: string) => {
+    // 로그인 후 돌아갈 페이지를 localStorage에 저장
+    if (redirectTo) {
+      localStorage.setItem("redirect_after_login", redirectTo);
+    }
     api.auth.loginWithGoogle();
   };
 
