@@ -30,9 +30,11 @@ export default function DeleteConfirmDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete URL</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete{" "}
-            <span className="font-semibold text-foreground">{shortUrl}</span>?
-            This action cannot be undone.
+            <p>
+              Are you sure you want to delete{" "}
+              <span className="font-semibold text-foreground">{shortUrl}</span>?
+            </p>
+            <p className="mt-2">This action cannot be undone.</p>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
