@@ -70,13 +70,18 @@ export default function MyUrlsPage() {
     toast.success("Copied to clipboard!");
   };
 
-  const handleEdit = (id: string, description: string) => {
-    // TODO: API 호출하여 description 업데이트
-    // 현재는 로컬 상태만 업데이트
-    setUrls((prevUrls) =>
-      prevUrls.map((url) => (url.id === id ? { ...url, description } : url))
-    );
-    toast.success("Description updated!");
+  const handleEdit = async (id: string, description: string) => {
+    try {
+      await api.myUrls.updateDescription(id, description);
+      // 로컬 상태 업데이트
+      setUrls((prevUrls) =>
+        prevUrls.map((url) => (url.id === id ? { ...url, description } : url))
+      );
+      toast.success("Description updated!");
+    } catch (error) {
+      toast.error("Failed to update description. Please try again.");
+      console.error("Update description error:", error);
+    }
   };
 
   const handleDelete = (id: string) => {

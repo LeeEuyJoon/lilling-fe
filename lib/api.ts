@@ -177,5 +177,14 @@ export const api = {
         method: "POST",
         body: JSON.stringify({ shortUrl }),
       }),
+
+    /**
+     * URL Description 업데이트
+     */
+    updateDescription: (urlId: string, description: string) =>
+      apiFetch<void>("/api/v1/my-urls/description", {
+        method: "PATCH",
+        body: JSON.stringify({ urlId: Number(urlId), description }),
+      }),
   },
 };
