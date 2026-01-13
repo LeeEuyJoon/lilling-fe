@@ -75,6 +75,10 @@ async function apiFetch<T>(
 
     // 401 Unauthorized인 경우
     if (response.status === 401) {
+      // auth context에 인증 실패 알림 (브라우저 환경에서만)
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("auth:unauthorized"));
+      }
       throw new ApiError(401, "Unauthorized", "로그인이 필요합니다.");
     }
 
