@@ -186,5 +186,13 @@ export const api = {
         method: "PATCH",
         body: JSON.stringify({ urlId: Number(urlId), description }),
       }),
+
+    /**
+     * URL 삭제
+     */
+    delete: (urlId: string) =>
+      apiFetch<void>(`/api/v1/my-urls/${urlId}`, {
+        method: "DELETE",
+      }),
   },
 };

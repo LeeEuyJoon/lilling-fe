@@ -24,11 +24,11 @@ export default function FakeStats() {
 
   return (
     <div className="flex gap-8 justify-center mt-18">
-      <div className="text-center">
-        <AnimatedCounter end={urlCount} />{" "}
-        <p className="text-sm text-muted-foreground">shortend urls</p>
+      <div className="text-center w-40 flex flex-col items-center">
+        <AnimatedCounter end={urlCount} />
+        <p className="text-sm text-muted-foreground">shortened urls</p>
       </div>
-      <div className="text-center">
+      <div className="text-center w-40 flex flex-col items-center">
         <AnimatedCounter end={clickCount} />
         <p className="text-sm text-muted-foreground">total clicks</p>
       </div>

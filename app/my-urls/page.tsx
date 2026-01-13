@@ -88,14 +88,19 @@ export default function MyUrlsPage() {
     setDeletingId(id);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deletingId) return;
 
-    // TODO: API 호출하여 삭제
-    // 현재는 로컬 상태만 업데이트하고 목록 새로고침
-    setDeletingId(null);
-    loadUrls(currentPage);
-    toast.success("URL deleted successfully!");
+    try {
+      await api.myUrls.delete(deletingId);
+      setDeletingId(null);
+      loadUrls(currentPage);
+      toast.success("URL deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete URL. Please try again.");
+      console.error("Delete error:", error);
+      setDeletingId(null);
+    }
   };
 
   const handlePageChange = (page: number) => {
