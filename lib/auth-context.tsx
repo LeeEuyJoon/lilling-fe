@@ -28,9 +28,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // 로그인 후 리다이렉트 처리 (한 번만 실행)
       if (response.isAuthenticated && !hasRedirected.current) {
         const redirectUrl = localStorage.getItem("redirect_after_login");
+        const pendingClaimUrl = localStorage.getItem("pending_claim_url");
+
         if (redirectUrl) {
           hasRedirected.current = true;
           localStorage.removeItem("redirect_after_login");
+
+          // pending claim이 있으면 먼저 처리
+          if (pendingClaimUrl) {
+            try {
+              await api.myUrls.claim(pendingClaimUrl);
+              localStorage.removeItem("pending_claim_url");
+            } catch (error) {
+              console.error("Error claiming URL:", error);
+            }
+          }
+
           router.push(redirectUrl);
         }
       }
