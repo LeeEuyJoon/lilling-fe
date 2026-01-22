@@ -1,10 +1,9 @@
 "use client";
 
-import { Button } from "@/components/shadcn/button";
-import { Input } from "@/components/shadcn/input";
-import { UrlItem } from "@/lib/dummyData";
-import { Copy, ExternalLink, Pencil, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { UrlItem } from "@/lib/api";
+import UrlInfoCard from "./UrlInfoCard";
+import WeeklyStatsCard from "./WeeklyStatsCard";
+import UrlCardFooter from "./UrlCardFooter";
 
 interface UrlCardProps {
   url: UrlItem;
@@ -19,145 +18,25 @@ export default function UrlCard({
   onEdit,
   onDelete,
 }: UrlCardProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [description, setDescription] = useState(url.description || "");
-
-  const extractDomain = (urlString: string) => {
-    try {
-      return new URL(urlString).hostname;
-    } catch {
-      return "";
-    }
-  };
-
-  const getFaviconUrl = (urlString: string) => {
-    const domain = extractDomain(urlString);
-    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-  };
-
-  const handleEditClick = () => {
-    setDescription(url.description || "");
-    setIsEditing(true);
-  };
-
-  const handleSave = () => {
-    onEdit(url.id, description);
-    setIsEditing(false);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleSave();
-    } else if (e.key === "Escape") {
-      setDescription(url.description || "");
-      setIsEditing(false);
-    }
-  };
-
   return (
-    <div className="border rounded-lg p-4 bg-card shadow-sm hover:shadow-md transition-all">
-      <div className="flex items-start gap-4 relative">
-        {/* 우측 상단 액션 버튼 */}
-        <div className="absolute top-0 right-0 flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => onCopy(url.shortUrl)}
-            title="Copy link"
-          >
-            <Copy className="size-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => onDelete(url.id)}
-            title="Delete"
-          >
-            <Trash2 className="size-4" />
-          </Button>
-        </div>
+    <div className="border rounded-lg p-4 pb-1 bg-card shadow-sm hover:shadow-md transition-all">
+      {/* 카드 */}
+      <div className="flex items-stretch gap-4">
+        {/* 왼쪽 카드: URL 정보 */}
+        <UrlInfoCard url={url} onCopy={onCopy} onEdit={onEdit} />
 
-        {/* Favicon */}
-        <img
-          src={getFaviconUrl(url.originalUrl)}
-          alt="favicon"
-          className="w-8 h-8 mt-1 flex-shrink-0"
-          onError={(e) => {
-            e.currentTarget.src = "/favicon.ico";
-          }}
-        />
-
-        {/* URL 정보 */}
-        <div className="flex-1 min-w-0 pr-20">
-          <div className="flex items-center gap-2 mb-1">
-            <a
-              href={`https://${url.shortUrl}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-primary hover:underline"
-            >
-              {url.shortUrl}
-            </a>
-            <ExternalLink className="size-4 text-muted-foreground" />
-          </div>
-
-          <p className="text-sm text-muted-foreground truncate mb-2">
-            {url.originalUrl}
-          </p>
-
-          {/* 설명 - 인라인 편집 */}
-          {isEditing ? (
-            <div className="mt-2 mb-3">
-              <Input
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onBlur={handleSave}
-                placeholder="Enter description..."
-                className="text-sm"
-                autoFocus
-              />
-            </div>
-          ) : (
-            <div
-              className="mt-2 mb-3 p-2 border border-dashed rounded bg-muted/30 text-sm cursor-pointer hover:border-primary transition-colors relative group"
-              onClick={handleEditClick}
-              title="Click to edit description"
-            >
-              {url.description ? (
-                <p className="pr-8">{url.description}</p>
-              ) : (
-                <p className="text-muted-foreground italic pr-8">
-                  Click to add description...
-                </p>
-              )}
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="absolute right-1 top-1"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleEditClick();
-                }}
-              >
-                <Pencil className="size-3" />
-              </Button>
-            </div>
-          )}
-
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <span>{url.clickCount} clicks</span>
-            <span>
-              Created{" "}
-              {new Date(url.createdAt).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })}
-            </span>
-          </div>
-        </div>
+        {/* 오른쪽 카드: 차트 */}
+        {url.recentDailyStats && url.recentDailyStats.length > 0 && (
+          <WeeklyStatsCard recentDailyStats={url.recentDailyStats} />
+        )}
       </div>
+
+      {/* 푸터 */}
+      <UrlCardFooter
+        clickCount={url.clickCount}
+        createdAt={url.createdAt}
+        onDelete={() => onDelete(url.id)}
+      />
     </div>
   );
 }

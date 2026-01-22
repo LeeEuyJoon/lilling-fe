@@ -116,7 +116,7 @@ export default function MyUrlsPage() {
   };
 
   return (
-    <main className="container mx-auto max-w-4xl p-8">
+    <main className="container mx-auto max-w-5xl p-8">
       <MyUrlsPageHeader onAddUrl={handleAddUrl} />
 
       {isLoadingUrls ? (

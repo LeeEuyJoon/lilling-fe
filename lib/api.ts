@@ -10,6 +10,10 @@ export interface UrlItem {
   description?: string;
   createdAt: string;
   clickCount: number;
+  recentDailyStats?: Array<{
+    date: string; // (YYYY-MM-DD)
+    clickCount: number;
+  }>;
 }
 
 export interface MyUrlsListResponse {
