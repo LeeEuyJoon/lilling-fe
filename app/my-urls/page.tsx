@@ -66,7 +66,7 @@ export default function MyUrlsPage() {
   }
 
   const handleCopy = (shortUrl: string) => {
-    navigator.clipboard.writeText(`https://${shortUrl}`);
+    navigator.clipboard.writeText(shortUrl);
     toast.success("Copied to clipboard!");
   };
 
