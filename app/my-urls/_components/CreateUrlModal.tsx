@@ -97,7 +97,9 @@ export default function CreateUrlModal({
         isOpen={isResultOpen}
         onOpenChange={setIsResultOpen}
         shortUrl={shortUrl}
-      />
+      >
+        {/* No button needed - already in My URLs page */}
+      </ResultDialog>
     </>
   );
 }

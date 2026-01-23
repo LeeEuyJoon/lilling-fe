@@ -3,6 +3,7 @@
 import { useState } from "react";
 import UrlShortenerForm from "./UrlShortenerForm";
 import ResultDialog from "./ResultDialog";
+import AddToMyUrlsButton from "./AddToMyUrlsButton";
 
 export default function UrlShortenerContainer() {
   const [originalUrl, setOriginalUrl] = useState("");
@@ -44,7 +45,9 @@ export default function UrlShortenerContainer() {
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         shortUrl={shortUrl}
-      />
+      >
+        <AddToMyUrlsButton shortUrl={shortUrl} />
+      </ResultDialog>
     </>
   );
 }
