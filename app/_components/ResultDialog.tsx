@@ -26,7 +26,7 @@ export default function ResultDialog({
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(shortUrl);
+    navigator.clipboard.writeText(`https://${shortUrl}`);
     setIsCopied(true);
 
     setTimeout(() => {
