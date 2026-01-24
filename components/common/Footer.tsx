@@ -18,11 +18,11 @@ export default function Footer() {
               <span>GitHub</span>
             </Link>
             <Link
-              href="mailto:wns6619@gmail.com"
+              href="mailto:lutidevzz@gmail.com"
               className="flex items-center gap-2 hover:text-foreground transition-colors"
             >
               <MdEmail className="w-4 h-4" />
-              <span>wns6619@gmail.com</span>
+              <span>lutidevzz@gmail.com</span>
             </Link>
           </div>
 
