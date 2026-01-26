@@ -29,6 +29,7 @@ interface AnalyticsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   shortUrl: string;
+  totalClickCount: number;
   analyticsData: UrlAnalyticsResponse | null;
 }
 
@@ -66,6 +67,7 @@ export default function AnalyticsModal({
   open,
   onOpenChange,
   shortUrl,
+  totalClickCount,
   analyticsData,
 }: AnalyticsModalProps) {
   const [timeUnit, setTimeUnit] = useState<TimeUnit>("daily");
@@ -197,9 +199,23 @@ export default function AnalyticsModal({
   };
 
   // 통계 계산
-  const totalClicks = values.reduce((sum, value) => sum + value, 0);
-  const avgClicks = values.length > 0 ? totalClicks / values.length : 0;
+  const periodClicks = values.reduce((sum, value) => sum + value, 0);
+  const avgClicks = values.length > 0 ? periodClicks / values.length : 0;
   const maxClicks = values.length > 0 ? Math.max(...values) : 0;
+
+  // 시간 단위에 따른 기간 텍스트
+  const getPeriodText = () => {
+    switch (timeUnit) {
+      case "hourly":
+        return "최근 24시간";
+      case "daily":
+        return "최근 30일";
+      case "weekly":
+        return "최근 12주";
+      case "monthly":
+        return "최근 12개월";
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -254,19 +270,25 @@ export default function AnalyticsModal({
           </div>
 
           {/* 통계 요약 */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-4 gap-4">
             <div className="border rounded-lg p-4 bg-muted/20">
-              <p className="text-sm text-muted-foreground">총 클릭 수</p>
+              <p className="text-sm text-muted-foreground">전체 클릭 수</p>
               <p className="text-2xl font-bold mt-1">
-                {totalClicks.toLocaleString()}
+                {totalClickCount.toLocaleString()}
               </p>
             </div>
             <div className="border rounded-lg p-4 bg-muted/20">
-              <p className="text-sm text-muted-foreground">평균 클릭 수</p>
+              <p className="text-sm text-muted-foreground">{getPeriodText()}의 총 클릭</p>
+              <p className="text-2xl font-bold mt-1">
+                {periodClicks.toLocaleString()}
+              </p>
+            </div>
+            <div className="border rounded-lg p-4 bg-muted/20">
+              <p className="text-sm text-muted-foreground">{getPeriodText()}의 평균</p>
               <p className="text-2xl font-bold mt-1">{avgClicks.toFixed(1)}</p>
             </div>
             <div className="border rounded-lg p-4 bg-muted/20">
-              <p className="text-sm text-muted-foreground">최대 클릭 수</p>
+              <p className="text-sm text-muted-foreground">{getPeriodText()}의 최대</p>
               <p className="text-2xl font-bold mt-1">
                 {maxClicks.toLocaleString()}
               </p>
