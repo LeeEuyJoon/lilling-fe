@@ -18,7 +18,10 @@ import {
   type MonthlyDataPoint,
 } from "@/lib/api";
 
-const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+const Chart = dynamic(() => import("react-apexcharts"), {
+  ssr: false,
+  loading: () => <div className="h-[350px] flex items-center justify-center">차트 로딩 중...</div>
+});
 
 type TimeUnit = "hourly" | "daily" | "weekly" | "monthly";
 
@@ -241,7 +244,13 @@ export default function AnalyticsModal({
 
           {/* 차트 */}
           <div className="border rounded-lg p-4 bg-card">
-            <Chart options={options} series={series} type="area" height={350} />
+            <Chart
+              key={timeUnit}
+              options={options}
+              series={series}
+              type="area"
+              height={350}
+            />
           </div>
 
           {/* 통계 요약 */}
