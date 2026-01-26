@@ -40,6 +40,41 @@ export interface AuthMeResponse {
 }
 
 /**
+ * Analytics API 응답 타입
+ */
+export interface HourlyDataPoint {
+  timestamp: string; // ISO 8601: "2025-01-26T00:00:00"
+  clickCount: number;
+}
+
+export interface DailyDataPoint {
+  date: string; // "2025-01-26"
+  clickCount: number;
+}
+
+export interface WeeklyDataPoint {
+  weekStart: string; // "2025-01-20"
+  clickCount: number;
+}
+
+export interface MonthlyDataPoint {
+  yearMonth: string; // "2025-01"
+  clickCount: number;
+}
+
+export interface TimeSeriesData<T> {
+  range: string; // "24h" | "30d" | "12w" | "12m"
+  data: T[];
+}
+
+export interface UrlAnalyticsResponse {
+  hourly: TimeSeriesData<HourlyDataPoint>;
+  daily: TimeSeriesData<DailyDataPoint>;
+  weekly: TimeSeriesData<WeeklyDataPoint>;
+  monthly: TimeSeriesData<MonthlyDataPoint>;
+}
+
+/**
  * API 에러 클래스
  */
 export class ApiError extends Error {
@@ -202,5 +237,11 @@ export const api = {
       apiFetch<void>(`/api/v1/my-urls/${urlId}`, {
         method: "DELETE",
       }),
+
+    /**
+     * URL 분석 데이터 조회
+     */
+    analytics: (urlId: string) =>
+      apiFetch<UrlAnalyticsResponse>(`/api/v1/my-urls/${urlId}/analytics`),
   },
 };

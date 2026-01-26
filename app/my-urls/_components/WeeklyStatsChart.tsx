@@ -96,14 +96,7 @@ export default function WeeklyStatsChart({
       },
     },
     tooltip: {
-      enabled: true,
-      theme: "light",
-      x: {
-        show: true,
-      },
-      y: {
-        formatter: (value) => `${value} clicks`,
-      },
+      enabled: false,
     },
     dataLabels: {
       enabled: false,

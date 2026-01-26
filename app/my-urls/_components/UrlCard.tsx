@@ -27,7 +27,11 @@ export default function UrlCard({
 
         {/* 오른쪽 카드: 차트 */}
         {url.recentDailyStats && url.recentDailyStats.length > 0 && (
-          <WeeklyStatsCard recentDailyStats={url.recentDailyStats} />
+          <WeeklyStatsCard
+            urlId={url.id}
+            shortUrl={url.shortUrl}
+            recentDailyStats={url.recentDailyStats}
+          />
         )}
       </div>
 
