@@ -10,6 +10,7 @@ import { toast } from "sonner";
 interface WeeklyStatsCardProps {
   urlId: string;
   shortUrl: string;
+  originalUrl: string;
   totalClickCount: number;
   recentDailyStats: Array<{
     date: string;
@@ -20,6 +21,7 @@ interface WeeklyStatsCardProps {
 export default function WeeklyStatsCard({
   urlId,
   shortUrl,
+  originalUrl,
   totalClickCount,
   recentDailyStats,
 }: WeeklyStatsCardProps) {
@@ -73,6 +75,7 @@ export default function WeeklyStatsCard({
         open={showAnalytics}
         onOpenChange={setShowAnalytics}
         shortUrl={shortUrl}
+        originalUrl={originalUrl}
         totalClickCount={totalClickCount}
         analyticsData={analyticsData}
       />

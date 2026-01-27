@@ -29,6 +29,7 @@ interface AnalyticsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   shortUrl: string;
+  originalUrl: string;
   totalClickCount: number;
   analyticsData: UrlAnalyticsResponse | null;
 }
@@ -67,10 +68,20 @@ export default function AnalyticsModal({
   open,
   onOpenChange,
   shortUrl,
+  originalUrl,
   totalClickCount,
   analyticsData,
 }: AnalyticsModalProps) {
   const [timeUnit, setTimeUnit] = useState<TimeUnit>("daily");
+
+  const getFaviconUrl = (urlString: string) => {
+    try {
+      const domain = new URL(urlString).hostname;
+      return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+    } catch {
+      return "";
+    }
+  };
 
   // 데이터가 없는 경우
   if (!analyticsData) {
@@ -78,8 +89,18 @@ export default function AnalyticsModal({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-5xl">
           <DialogHeader>
-            <DialogTitle>클릭 통계 상세</DialogTitle>
-            <p className="text-sm text-muted-foreground mt-1">{shortUrl}</p>
+            <div className="flex items-center gap-3">
+              <img
+                src={getFaviconUrl(originalUrl)}
+                alt="favicon"
+                className="w-6 h-6 shrink-0"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+              <DialogTitle className="text-base font-medium">{shortUrl}</DialogTitle>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1 truncate">{originalUrl}</p>
           </DialogHeader>
           <div className="flex items-center justify-center py-12">
             <p className="text-muted-foreground">통계 데이터를 불러오는 중...</p>
@@ -221,8 +242,18 @@ export default function AnalyticsModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>클릭 통계 상세</DialogTitle>
-          <p className="text-sm text-muted-foreground mt-1">{shortUrl}</p>
+          <div className="flex items-center gap-3">
+            <img
+              src={getFaviconUrl(originalUrl)}
+              alt="favicon"
+              className="w-6 h-6 shrink-0"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+            <DialogTitle className="text-base font-medium">{shortUrl}</DialogTitle>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1 truncate">{originalUrl}</p>
         </DialogHeader>
 
         <div className="space-y-4">

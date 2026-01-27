@@ -30,6 +30,7 @@ export default function UrlCard({
           <WeeklyStatsCard
             urlId={url.id}
             shortUrl={url.shortUrl}
+            originalUrl={url.originalUrl}
             totalClickCount={url.clickCount}
             recentDailyStats={url.recentDailyStats}
           />
