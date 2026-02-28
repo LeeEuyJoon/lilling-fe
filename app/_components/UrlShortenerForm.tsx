@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/shadcn/button";
 import { Input } from "@/components/shadcn/input";
-import { useState, FormEvent } from "react";
-import { ChevronDown } from "lucide-react";
+import { useState, useRef, FormEvent } from "react";
+import { Plus, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const MAX_KEYWORD_LENGTH = 7;
@@ -21,11 +21,18 @@ export default function UrlShortenerForm({
   const [url, setUrl] = useState("");
   const [keyword, setKeyword] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showInvalidHint, setShowInvalidHint] = useState(false);
+  const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleKeywordChange = (value: string) => {
-    // Only allow base62 characters and enforce max length
-    if (!BASE62_PATTERN.test(value)) return;
+    if (!BASE62_PATTERN.test(value)) {
+      setShowInvalidHint(true);
+      if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
+      hintTimerRef.current = setTimeout(() => setShowInvalidHint(false), 2000);
+      return;
+    }
     if (value.length > MAX_KEYWORD_LENGTH) return;
+    setShowInvalidHint(false);
     setKeyword(value);
   };
 
@@ -86,8 +93,12 @@ export default function UrlShortenerForm({
                       {keyword.length}/{MAX_KEYWORD_LENGTH}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {keyword.length > 0 ? (
+                  <p className="text-xs text-foreground/60">
+                    {showInvalidHint ? (
+                      <span className="text-destructive font-medium">
+                        Only letters (a-z, A-Z) and numbers (0-9) allowed
+                      </span>
+                    ) : keyword.length > 0 ? (
                       <>
                         lill.ing/
                         <span className="text-primary font-medium">{keyword}</span>
@@ -98,8 +109,9 @@ export default function UrlShortenerForm({
                         Your keyword will be included at the start
                         <br />
                         e.g. keyword{" "}
-                        <span className="font-medium">BOOK</span> →{" "}
-                        <span className="font-medium">lill.ing/BOOK3jP</span>
+                        <span className="font-semibold text-foreground/80">BOOK</span>
+                        {" → "}
+                        <span className="font-semibold text-foreground/80">lill.ing/BOOK3jP</span>
                       </>
                     )}
                   </p>
@@ -112,15 +124,9 @@ export default function UrlShortenerForm({
             layout
             type="button"
             onClick={handleToggle}
-            className="flex items-center gap-1 w-fit text-sm font-medium text-foreground/70 hover:text-foreground transition-colors underline-offset-2"
+            className="flex items-center gap-1 w-fit text-xs font-medium border border-foreground/60 rounded-full px-2.5 py-1 text-foreground/70 hover:text-foreground hover:border-foreground transition-colors"
           >
-            <motion.span
-              animate={{ rotate: isExpanded ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
-              className="flex items-center"
-            >
-              <ChevronDown size={14} />
-            </motion.span>
+            {isExpanded ? <X size={11} /> : <Plus size={11} />}
             Include a keyword
           </motion.button>
         </div>
