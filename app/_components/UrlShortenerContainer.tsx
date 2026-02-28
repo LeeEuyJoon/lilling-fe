@@ -11,7 +11,7 @@ export default function UrlShortenerContainer() {
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleSubmit = async (url: string) => {
+  const handleSubmit = async (url: string, _keyword?: string) => {
     setIsLoading(true);
 
     try {
