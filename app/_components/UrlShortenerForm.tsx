@@ -2,12 +2,10 @@
 
 import { Button } from "@/components/shadcn/button";
 import { Input } from "@/components/shadcn/input";
-import { useState, useRef, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import { Plus, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-const MAX_KEYWORD_LENGTH = 7;
-const BASE62_PATTERN = /^[0-9a-zA-Z]*$/;
+import KeywordInput from "./KeywordInput";
 
 interface UrlShortenerFormProps {
   onSubmit: (url: string, keyword?: string) => Promise<void>;
@@ -21,20 +19,6 @@ export default function UrlShortenerForm({
   const [url, setUrl] = useState("");
   const [keyword, setKeyword] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
-  const [showInvalidHint, setShowInvalidHint] = useState(false);
-  const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const handleKeywordChange = (value: string) => {
-    if (!BASE62_PATTERN.test(value)) {
-      setShowInvalidHint(true);
-      if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
-      hintTimerRef.current = setTimeout(() => setShowInvalidHint(false), 2000);
-      return;
-    }
-    if (value.length > MAX_KEYWORD_LENGTH) return;
-    setShowInvalidHint(false);
-    setKeyword(value);
-  };
 
   const handleToggle = () => {
     if (isExpanded) {
@@ -49,9 +33,6 @@ export default function UrlShortenerForm({
     setUrl("");
     setKeyword("");
   };
-
-  const hasKeywordError = keyword.length > 0 && !BASE62_PATTERN.test(keyword);
-  const remainingPlaceholder = "·".repeat(MAX_KEYWORD_LENGTH - keyword.length);
 
   return (
     <div className="flex flex-col gap-2">
@@ -79,42 +60,13 @@ export default function UrlShortenerForm({
                 transition={{ duration: 0.2, ease: "easeInOut" }}
                 className="overflow-hidden"
               >
-                <div className="flex flex-col gap-0.5 pb-0.5">
-                  <div className="relative w-48">
-                    <Input
-                      type="text"
-                      placeholder="keyword"
-                      value={keyword}
-                      onChange={(e) => handleKeywordChange(e.target.value)}
-                      className="h-7! text-sm border-dashed border-primary pr-10"
-                      maxLength={MAX_KEYWORD_LENGTH}
-                    />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
-                      {keyword.length}/{MAX_KEYWORD_LENGTH}
-                    </span>
-                  </div>
-                  <p className="text-xs text-foreground/60">
-                    {showInvalidHint ? (
-                      <span className="text-destructive font-medium">
-                        Only letters (a-z, A-Z) and numbers (0-9) allowed
-                      </span>
-                    ) : keyword.length > 0 ? (
-                      <>
-                        lill.ing/
-                        <span className="text-primary font-medium">{keyword}</span>
-                        <span>{remainingPlaceholder}</span>
-                      </>
-                    ) : (
-                      <>
-                        Your keyword will be included at the start
-                        <br />
-                        e.g. keyword{" "}
-                        <span className="font-semibold text-foreground/80">BOOK</span>
-                        {" → "}
-                        <span className="font-semibold text-foreground/80">lill.ing/BOOK3jP</span>
-                      </>
-                    )}
-                  </p>
+                <div className="pb-0.5">
+                  <KeywordInput
+                    value={keyword}
+                    onChange={setKeyword}
+                    inputWrapperClassName="w-48"
+                    inputClassName="border-primary"
+                  />
                 </div>
               </motion.div>
             )}
@@ -135,7 +87,7 @@ export default function UrlShortenerForm({
         <Button
           type="submit"
           form="shorten-form"
-          disabled={isLoading || hasKeywordError}
+          disabled={isLoading}
           className="shrink-0"
         >
           {isLoading ? "Converting..." : "Convert"}
