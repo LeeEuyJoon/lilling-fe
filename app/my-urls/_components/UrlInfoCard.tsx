@@ -53,7 +53,7 @@ export default function UrlInfoCard({ url, onCopy, onEdit }: UrlInfoCardProps) {
   };
 
   return (
-    <div className="flex-1 border rounded-lg p-3 bg-muted/20">
+    <div className="flex-1 min-w-0 border rounded-lg p-3 bg-muted/20">
       <div className="flex items-start gap-3">
         {/* Favicon */}
         <img
