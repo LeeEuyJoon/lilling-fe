@@ -185,10 +185,10 @@ export const api = {
     /**
      * URL 단축
      */
-    shorten: (originalUrl: string) =>
+    shorten: (originalUrl: string, keyword?: string) =>
       apiFetch<{ shortUrl: string }>("/api/v1/url/shorten", {
         method: "POST",
-        body: JSON.stringify({ originalUrl }),
+        body: JSON.stringify({ originalUrl, ...(keyword ? { keyword } : {}) }),
       }),
   },
 

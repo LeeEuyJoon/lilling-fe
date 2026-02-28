@@ -47,7 +47,7 @@ export default function CreateUrlModal({
 
     setIsLoading(true);
     try {
-      const response = await api.url.shorten(urlInput);
+      const response = await api.url.shorten(urlInput, keyword || undefined);
       setShortUrl(response.shortUrl);
       onOpenChange(false); // Close input modal
       setIsResultOpen(true); // Open result modal
