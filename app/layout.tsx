@@ -6,6 +6,7 @@ import Navbar from "@/components/common/Navbar";
 import { Toaster } from "@/components/shadcn/sonner";
 import { AuthProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "next-themes";
+import ParticlesBackground from "./_components/ParticlesBackground";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -24,8 +25,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} antialiased flex flex-col min-h-screen`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
+      <body
+        className={`${inter.variable} antialiased flex flex-col min-h-screen`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          disableTransitionOnChange
+        >
+          <ParticlesBackground />
           <AuthProvider>
             <Navbar />
             <div className="flex-1">{children}</div>
