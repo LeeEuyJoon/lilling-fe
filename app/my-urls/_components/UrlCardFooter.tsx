@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/shadcn/button";
 import { Trash2 } from "lucide-react";
 
 interface UrlCardFooterProps {
@@ -15,22 +14,22 @@ export default function UrlCardFooter({
   onDelete,
 }: UrlCardFooterProps) {
   return (
-    <div className="flex items-center justify-between mt-0 py-1">
-      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-        <span>{clickCount} clicks</span>
-        <span>
-          Created{" "}
-          {new Date(createdAt).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })}
-        </span>
-      </div>
-
-      <Button variant="ghost" size="icon-sm" onClick={onDelete} title="Delete">
-        <Trash2 className="size-4" />
-      </Button>
+    <div className="flex items-center justify-between mt-3 pt-3 border-t border-neutral-100 dark:border-white/6">
+      <p className="text-xs text-neutral-400 dark:text-white/40">
+        {new Date(createdAt).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })}{" "}
+        · {clickCount} clicks
+      </p>
+      <button
+        onClick={onDelete}
+        className="flex items-center gap-1 text-xs text-neutral-400 dark:text-white/40 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+        title="Delete"
+      >
+        <Trash2 size={11} /> Delete
+      </button>
     </div>
   );
 }

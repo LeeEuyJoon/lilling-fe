@@ -79,7 +79,6 @@ const chartSeries = [
   },
 ];
 
-// Decorative background chart for the MyUrlsButton section
 export default function MyUrlsPreviewChart() {
   return (
     <div className="pointer-events-none select-none">

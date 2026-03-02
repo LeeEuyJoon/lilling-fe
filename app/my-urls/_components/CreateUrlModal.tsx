@@ -1,13 +1,8 @@
 "use client";
 
-import { Button } from "@/components/shadcn/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/shadcn/dialog";
 import { Input } from "@/components/shadcn/input";
 import { Link2, Loader2 } from "lucide-react";
@@ -41,9 +36,9 @@ export default function CreateUrlModal({
     try {
       const response = await api.url.shorten(urlInput, keyword || undefined);
       setShortUrl(response.shortUrl);
-      onOpenChange(false); // Close input modal
-      setIsResultOpen(true); // Open result modal
-      onSuccess?.(); // Refresh URL list
+      onOpenChange(false);
+      setIsResultOpen(true);
+      onSuccess?.();
     } catch (error) {
       toast.error("Failed to shorten URL. Please try again.");
       console.error("Shorten error:", error);
@@ -61,16 +56,19 @@ export default function CreateUrlModal({
   return (
     <>
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create Short URL</DialogTitle>
-            <DialogDescription>
-              Enter a long URL to shorten it
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-3">
+        <DialogContent className="sm:max-w-sm p-0 overflow-hidden gap-0
+          bg-white border-neutral-200
+          dark:bg-zinc-900 dark:border-white/10">
+          {/* Header */}
+          <div className="px-6 pt-6 pb-4 border-b border-neutral-100 dark:border-white/8">
+            <h2 className="text-lg font-black text-neutral-900 dark:text-white">Create Short URL</h2>
+            <p className="text-sm mt-0.5 text-neutral-500 dark:text-white/40">Enter a long URL to shorten it</p>
+          </div>
+
+          {/* Body */}
+          <div className="px-6 py-5 flex flex-col gap-4">
             <div className="relative">
-              <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-muted-foreground" />
+              <Link2 className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-neutral-400 dark:text-white/30" />
               <Input
                 type="url"
                 placeholder="https://example.com/very/long/url"
@@ -81,7 +79,7 @@ export default function CreateUrlModal({
                     handleShorten();
                   }
                 }}
-                className="pl-10"
+                className="pl-10 bg-neutral-50 border-neutral-200 dark:bg-white/5 dark:border-white/10"
                 disabled={isLoading}
               />
             </div>
@@ -93,15 +91,29 @@ export default function CreateUrlModal({
               inputWrapperClassName="w-52"
             />
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleClose} disabled={isLoading}>
+
+          {/* Footer */}
+          <div className="px-6 py-4 border-t border-neutral-100 dark:border-white/8 flex items-center justify-end gap-2">
+            <button
+              onClick={handleClose}
+              disabled={isLoading}
+              className="text-sm font-semibold px-4 py-2 rounded-lg border transition-colors
+                border-neutral-200 text-neutral-600 hover:bg-neutral-50
+                dark:border-white/10 dark:text-white/60 dark:hover:border-white/20"
+            >
               Cancel
-            </Button>
-            <Button onClick={handleShorten} disabled={!urlInput.trim() || isLoading}>
-              {isLoading && <Loader2 className="size-4 animate-spin mr-2" />}
+            </button>
+            <button
+              onClick={handleShorten}
+              disabled={!urlInput.trim() || isLoading}
+              className="flex items-center gap-1.5 text-sm font-bold px-4 py-2 rounded-lg text-white transition-colors
+                bg-violet-600 hover:bg-violet-500 shadow-lg shadow-violet-900/30
+                disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading && <Loader2 className="size-4 animate-spin" />}
               Shorten URL
-            </Button>
-          </DialogFooter>
+            </button>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -109,9 +121,7 @@ export default function CreateUrlModal({
         isOpen={isResultOpen}
         onOpenChange={setIsResultOpen}
         shortUrl={shortUrl}
-      >
-        {/* No button needed - already in My URLs page */}
-      </ResultDialog>
+      />
     </>
   );
 }

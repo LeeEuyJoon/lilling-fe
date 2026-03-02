@@ -1,13 +1,8 @@
 "use client";
 
-import { Button } from "@/components/shadcn/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/shadcn/dialog";
 import { Input } from "@/components/shadcn/input";
 import {
@@ -115,117 +110,125 @@ export default function AddExistingUrlModal({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add Existing Short URL</DialogTitle>
-          <DialogDescription>
-            Enter the short code of an existing shortened URL to add it to your
-            list
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-sm p-0 overflow-hidden gap-0
+        bg-white border-neutral-200
+        dark:bg-zinc-900 dark:border-white/10">
+        {/* Header */}
+        <div className="px-6 pt-6 pb-4 border-b border-neutral-100 dark:border-white/8">
+          <h2 className="text-lg font-black text-neutral-900 dark:text-white">Add Existing URL</h2>
+          <p className="text-sm mt-0.5 text-neutral-500 dark:text-white/40">
+            Enter a short code to add it to your list
+          </p>
+        </div>
 
-        <div className="space-y-4">
-          {/* 입력 섹션 */}
-          <div className="space-y-2">
-            <div className="relative">
-              <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="abc123"
-                value={shortCode}
-                onChange={(e) => setShortCode(e.target.value)}
-                onKeyDown={(e) => {
-                  if (
-                    e.key === "Enter" &&
-                    shortCode.trim() &&
-                    verificationState === "idle"
-                  ) {
-                    handleVerify();
-                  }
-                }}
-                className="pl-10"
-                disabled={verificationState === "verifying"}
-              />
-            </div>
-            {verificationState === "idle" && (
-              <Button
-                onClick={handleVerify}
-                disabled={!shortCode.trim()}
-                className="w-full"
-                variant="outline"
-              >
-                Verify URL
-              </Button>
-            )}
+        {/* Body */}
+        <div className="px-6 py-5 flex flex-col gap-3">
+          <div className="relative">
+            <Link2 className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-neutral-400 dark:text-white/30" />
+            <Input
+              type="text"
+              placeholder="abc123"
+              value={shortCode}
+              onChange={(e) => setShortCode(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && shortCode.trim() && verificationState === "idle") {
+                  handleVerify();
+                }
+              }}
+              className="pl-10 bg-neutral-50 border-neutral-200 dark:bg-white/5 dark:border-white/10"
+              disabled={verificationState === "verifying"}
+            />
           </div>
 
-          {/* 검증 상태 */}
+          {verificationState === "idle" && (
+            <button
+              onClick={handleVerify}
+              disabled={!shortCode.trim()}
+              className="w-full text-sm font-semibold py-2 rounded-lg border transition-colors
+                border-neutral-200 text-neutral-600 hover:bg-neutral-50
+                dark:border-white/10 dark:text-white/60 dark:hover:border-white/20
+                disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Verify URL
+            </button>
+          )}
+
           {verificationState === "verifying" && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground p-4 bg-muted/30 rounded-lg">
+            <div className="flex items-center gap-2 text-sm text-neutral-500 dark:text-white/40 p-3 rounded-lg bg-neutral-50 dark:bg-white/5">
               <Loader2 className="size-4 animate-spin" />
-              <span>Verifying URL...</span>
+              Verifying URL...
             </div>
           )}
 
-          {/* 성공 - URL 미리보기 */}
           {verificationState === "success" && verifiedUrl && (
-            <div className="border rounded-lg p-4 bg-muted/30 space-y-3">
+            <div className="border rounded-lg p-3 bg-neutral-50 dark:bg-white/4 border-neutral-200 dark:border-white/8 space-y-2">
               <div className="flex items-start gap-2">
-                <CheckCircle className="size-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div className="flex-1 min-w-0 space-y-2">
-                  <div>
-                    <p className="font-semibold text-sm">
-                      {verifiedUrl.shortUrl}
-                    </p>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                      <ExternalLink className="size-3" />
-                      <p className="truncate">{verifiedUrl.originalUrl}</p>
-                    </div>
+                <CheckCircle className="size-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-black text-violet-600 dark:text-violet-400">
+                    {verifiedUrl.shortUrl}
+                  </p>
+                  <div className="flex items-center gap-1 text-xs text-neutral-400 dark:text-white/40 mt-0.5">
+                    <ExternalLink className="size-3" />
+                    <p className="truncate">{verifiedUrl.originalUrl}</p>
                   </div>
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                    <span>{verifiedUrl.clickCount} clicks</span>
-                  </div>
+                  <p className="text-xs text-neutral-400 dark:text-white/40 mt-1">{verifiedUrl.clickCount} clicks</p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* 에러 */}
           {verificationState === "error" && (
-            <div className="flex items-start gap-2 text-sm text-destructive p-4 bg-destructive/10 rounded-lg">
-              <XCircle className="size-4 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 text-sm p-3 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
+              <XCircle className="size-4 text-red-500 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold">Verification Failed</p>
-                <p className="text-xs mt-1">{errorMessage}</p>
+                <p className="font-semibold text-red-600 dark:text-red-400">Verification Failed</p>
+                <p className="text-xs mt-0.5 text-red-500 dark:text-red-400/70">{errorMessage}</p>
               </div>
             </div>
           )}
         </div>
 
-        <DialogFooter>
-          <Button
-            variant="outline"
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-neutral-100 dark:border-white/8 flex items-center justify-end gap-2">
+          <button
             onClick={handleClose}
             disabled={verificationState === "claiming"}
+            className="text-sm font-semibold px-4 py-2 rounded-lg border transition-colors
+              border-neutral-200 text-neutral-600 hover:bg-neutral-50
+              dark:border-white/10 dark:text-white/60 dark:hover:border-white/20
+              disabled:opacity-50"
           >
             Cancel
-          </Button>
+          </button>
           {verificationState === "success" ? (
-            <Button onClick={handleAdd}>Add to List</Button>
+            <button
+              onClick={handleAdd}
+              className="text-sm font-bold px-4 py-2 rounded-lg text-white transition-colors
+                bg-violet-600 hover:bg-violet-500 shadow-lg shadow-violet-900/30"
+            >
+              Add to List
+            </button>
           ) : verificationState === "claiming" ? (
-            <Button disabled>
-              <Loader2 className="size-4 animate-spin mr-2" />
+            <button
+              disabled
+              className="flex items-center gap-1.5 text-sm font-bold px-4 py-2 rounded-lg text-white
+                bg-violet-600 opacity-70 cursor-not-allowed"
+            >
+              <Loader2 className="size-4 animate-spin" />
               Adding...
-            </Button>
+            </button>
           ) : verificationState === "error" ? (
-            <Button
+            <button
               onClick={() => setVerificationState("idle")}
-              variant="outline"
+              className="text-sm font-semibold px-4 py-2 rounded-lg border transition-colors
+                border-neutral-200 text-neutral-600 hover:bg-neutral-50
+                dark:border-white/10 dark:text-white/60 dark:hover:border-white/20"
             >
               Try Again
-            </Button>
+            </button>
           ) : null}
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

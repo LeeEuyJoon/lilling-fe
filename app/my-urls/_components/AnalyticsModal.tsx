@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/shadcn/dialog";
-import { Button } from "@/components/shadcn/button";
 import dynamic from "next/dynamic";
 import { ApexOptions } from "apexcharts";
 import {
@@ -20,7 +19,13 @@ import {
 
 const Chart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
-  loading: () => <div className="h-[350px] flex items-center justify-center">차트 로딩 중...</div>
+  loading: () => (
+    <div className="h-[350px] flex items-center justify-center">
+      <span className="text-neutral-400 dark:text-white/30 text-sm">
+        차트 로딩 중...
+      </span>
+    </div>
+  ),
 });
 
 type TimeUnit = "hourly" | "daily" | "weekly" | "monthly";
@@ -64,6 +69,13 @@ function formatLabel(
   }
 }
 
+const TIME_UNIT_LABELS: { value: TimeUnit; label: string }[] = [
+  { value: "hourly", label: "시간" },
+  { value: "daily", label: "일" },
+  { value: "weekly", label: "주" },
+  { value: "monthly", label: "월" },
+];
+
 export default function AnalyticsModal({
   open,
   onOpenChange,
@@ -73,6 +85,19 @@ export default function AnalyticsModal({
   analyticsData,
 }: AnalyticsModalProps) {
   const [timeUnit, setTimeUnit] = useState<TimeUnit>("daily");
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const update = () =>
+      setIsDark(document.documentElement.classList.contains("dark"));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
   const getFaviconUrl = (urlString: string) => {
     try {
@@ -82,6 +107,10 @@ export default function AnalyticsModal({
       return "";
     }
   };
+
+  const labelColor = isDark ? "rgba(255,255,255,0.35)" : "#64748b";
+  const gridColor = isDark ? "rgba(255,255,255,0.07)" : "#e2e8f0";
+  const tooltipTheme = isDark ? "dark" : "light";
 
   // 데이터가 없는 경우
   if (!analyticsData) {
@@ -98,12 +127,18 @@ export default function AnalyticsModal({
                   e.currentTarget.style.display = "none";
                 }}
               />
-              <DialogTitle className="text-base font-medium">{shortUrl}</DialogTitle>
+              <DialogTitle className="text-lg font-black text-neutral-900 dark:text-white">
+                {shortUrl}
+              </DialogTitle>
             </div>
-            <p className="text-sm text-muted-foreground mt-1 truncate">{originalUrl}</p>
+            <p className="text-xs text-neutral-400 dark:text-white/30 truncate mt-1">
+              {originalUrl}
+            </p>
           </DialogHeader>
           <div className="flex items-center justify-center py-12">
-            <p className="text-muted-foreground">통계 데이터를 불러오는 중...</p>
+            <p className="text-neutral-400 dark:text-white/30 text-sm">
+              통계 데이터를 불러오는 중...
+            </p>
           </div>
         </DialogContent>
       </Dialog>
@@ -150,6 +185,7 @@ export default function AnalyticsModal({
       zoom: {
         enabled: false,
       },
+      background: "transparent",
     },
     dataLabels: {
       enabled: false,
@@ -167,13 +203,13 @@ export default function AnalyticsModal({
         stops: [0, 90, 100],
       },
     },
-    colors: ["#3b82f6"],
+    colors: ["#7c3aed"],
     xaxis: {
       categories: labels,
       labels: {
         style: {
           fontSize: "12px",
-          colors: "#64748b",
+          colors: labelColor,
         },
         rotate: 0,
         // 레이블을 간격을 두고 표시
@@ -193,18 +229,18 @@ export default function AnalyticsModal({
       labels: {
         style: {
           fontSize: "12px",
-          colors: "#64748b",
+          colors: labelColor,
         },
         formatter: (value) => Math.floor(value).toString(),
       },
     },
     grid: {
-      borderColor: "#e2e8f0",
+      borderColor: gridColor,
       strokeDashArray: 3,
     },
     tooltip: {
       enabled: true,
-      theme: "light",
+      theme: tooltipTheme,
       y: {
         formatter: (value) => `${value} 클릭`,
       },
@@ -213,7 +249,7 @@ export default function AnalyticsModal({
     annotations: timeUnit === "hourly" ? {
       xaxis: midnightIndices.map((index) => ({
         x: labels[index],
-        borderColor: "#374151",
+        borderColor: isDark ? "rgba(255,255,255,0.3)" : "#374151",
         strokeDashArray: 4,
       })),
     } : undefined,
@@ -251,48 +287,38 @@ export default function AnalyticsModal({
                 e.currentTarget.style.display = "none";
               }}
             />
-            <DialogTitle className="text-base font-medium">{shortUrl}</DialogTitle>
+            <DialogTitle className="text-lg font-black text-neutral-900 dark:text-white">
+              {shortUrl}
+            </DialogTitle>
           </div>
-          <p className="text-sm text-muted-foreground mt-1 truncate">{originalUrl}</p>
+          <p className="text-xs text-neutral-400 dark:text-white/30 truncate mt-1">
+            {originalUrl}
+          </p>
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* 시간 단위 선택 버튼 */}
-          <div className="flex gap-2">
-            <Button
-              variant={timeUnit === "hourly" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setTimeUnit("hourly")}
-            >
-              시간
-            </Button>
-            <Button
-              variant={timeUnit === "daily" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setTimeUnit("daily")}
-            >
-              일
-            </Button>
-            <Button
-              variant={timeUnit === "weekly" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setTimeUnit("weekly")}
-            >
-              주
-            </Button>
-            <Button
-              variant={timeUnit === "monthly" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setTimeUnit("monthly")}
-            >
-              월
-            </Button>
+          {/* 시간 단위 선택 - 커스텀 pill 탭 */}
+          <div className="flex gap-1 p-1 rounded-lg bg-neutral-100 dark:bg-white/5 w-fit">
+            {TIME_UNIT_LABELS.map(({ value, label }) => (
+              <button
+                key={value}
+                onClick={() => setTimeUnit(value)}
+                className={[
+                  "px-3 py-1 rounded-md text-sm font-medium transition-all duration-150",
+                  timeUnit === value
+                    ? "bg-violet-600 text-white shadow-sm"
+                    : "text-neutral-500 hover:text-neutral-700 dark:text-white/40 dark:hover:text-white/70",
+                ].join(" ")}
+              >
+                {label}
+              </button>
+            ))}
           </div>
 
           {/* 차트 */}
-          <div className="border rounded-lg p-4 bg-card">
+          <div className="bg-neutral-50 dark:bg-white/3 rounded-xl px-2 pt-2">
             <Chart
-              key={timeUnit}
+              key={`${timeUnit}-${isDark}`}
               options={options}
               series={series}
               type="area"
@@ -302,25 +328,28 @@ export default function AnalyticsModal({
 
           {/* 통계 요약 */}
           <div className="grid grid-cols-4 gap-4">
-            <div className="border rounded-lg p-4 bg-muted/20">
-              <p className="text-sm text-muted-foreground">전체 클릭 수</p>
-              <p className="text-2xl font-bold mt-1">
+            {/* 전체 클릭 수 - 바이올렛 강조 */}
+            <div className="rounded-xl p-4 border border-violet-200 dark:border-violet-500/20 bg-violet-50 dark:bg-violet-500/5">
+              <p className="text-xs text-neutral-500 dark:text-white/40">전체 클릭 수</p>
+              <p className="text-2xl font-black text-violet-700 dark:text-violet-400 mt-1">
                 {totalClickCount.toLocaleString()}
               </p>
             </div>
-            <div className="border rounded-lg p-4 bg-muted/20">
-              <p className="text-sm text-muted-foreground">{getPeriodText()}의 총 클릭</p>
-              <p className="text-2xl font-bold mt-1">
+            <div className="rounded-xl p-4 border border-neutral-200 dark:border-white/8 bg-neutral-50 dark:bg-white/4">
+              <p className="text-xs text-neutral-500 dark:text-white/40">{getPeriodText()}의 총 클릭</p>
+              <p className="text-2xl font-black text-neutral-900 dark:text-white mt-1">
                 {periodClicks.toLocaleString()}
               </p>
             </div>
-            <div className="border rounded-lg p-4 bg-muted/20">
-              <p className="text-sm text-muted-foreground">{getPeriodText()}의 평균</p>
-              <p className="text-2xl font-bold mt-1">{avgClicks.toFixed(1)}</p>
+            <div className="rounded-xl p-4 border border-neutral-200 dark:border-white/8 bg-neutral-50 dark:bg-white/4">
+              <p className="text-xs text-neutral-500 dark:text-white/40">{getPeriodText()}의 평균</p>
+              <p className="text-2xl font-black text-neutral-900 dark:text-white mt-1">
+                {avgClicks.toFixed(1)}
+              </p>
             </div>
-            <div className="border rounded-lg p-4 bg-muted/20">
-              <p className="text-sm text-muted-foreground">{getPeriodText()}의 최대</p>
-              <p className="text-2xl font-bold mt-1">
+            <div className="rounded-xl p-4 border border-neutral-200 dark:border-white/8 bg-neutral-50 dark:bg-white/4">
+              <p className="text-xs text-neutral-500 dark:text-white/40">{getPeriodText()}의 최대</p>
+              <p className="text-2xl font-black text-neutral-900 dark:text-white mt-1">
                 {maxClicks.toLocaleString()}
               </p>
             </div>

@@ -121,7 +121,7 @@ export default function MyUrlsPage() {
 
       {isLoadingUrls ? (
         <div className="text-center py-12">
-          <p className="text-gray-500">Loading...</p>
+          <p className="text-neutral-400 dark:text-white/40">Loading...</p>
         </div>
       ) : urls.length === 0 ? (
         <EmptyState />

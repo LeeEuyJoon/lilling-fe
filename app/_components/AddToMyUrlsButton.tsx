@@ -1,10 +1,10 @@
 "use client";
 
-import { Button } from "@/components/shadcn/button";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
+import { ExternalLink } from "lucide-react";
 
 interface AddToMyUrlsButtonProps {
   shortUrl: string;
@@ -20,10 +20,8 @@ export default function AddToMyUrlsButton({ shortUrl }: AddToMyUrlsButtonProps) 
 
     try {
       if (isAuthenticated) {
-        // Logged in: just redirect
         router.push("/my-urls");
       } else {
-        // Not logged in: save and login
         localStorage.setItem("pending_claim_url", shortUrl);
         localStorage.setItem("redirect_after_login", "/my-urls");
         api.auth.loginWithGoogle();
@@ -35,13 +33,13 @@ export default function AddToMyUrlsButton({ shortUrl }: AddToMyUrlsButtonProps) 
   };
 
   return (
-    <Button
+    <button
       onClick={handleAddToMyUrls}
       disabled={isAdding}
-      variant="outline"
-      className="w-full border-black hover:bg-gray-300 transition-colors"
+      className="flex items-center gap-1.5 text-sm font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors disabled:opacity-50"
     >
-      {isAdding ? "Adding..." : "Add to My URLs"}
-    </Button>
+      <ExternalLink size={13} />
+      {isAdding ? "Adding..." : "View in My URLs"}
+    </button>
   );
 }

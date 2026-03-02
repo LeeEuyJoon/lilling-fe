@@ -23,14 +23,19 @@ export default function FakeStats() {
   }, []);
 
   return (
-    <div className="flex gap-8 justify-center mt-18">
-      <div className="text-center w-40 flex flex-col items-center">
-        <AnimatedCounter end={urlCount} />
-        <p className="text-sm text-muted-foreground">shortened urls</p>
+    <div className="flex items-center justify-center gap-8">
+      <div className="text-center">
+        <div className="flex justify-center">
+          <AnimatedCounter end={urlCount} />
+        </div>
+        <p className="text-xs text-neutral-500 dark:text-white/40 mt-0.5">URLs shortened</p>
       </div>
-      <div className="text-center w-40 flex flex-col items-center">
-        <AnimatedCounter end={clickCount} />
-        <p className="text-sm text-muted-foreground">total clicks</p>
+      <div className="w-px h-8 bg-neutral-200 dark:bg-white/10" />
+      <div className="text-center">
+        <div className="flex justify-center">
+          <AnimatedCounter end={clickCount} />
+        </div>
+        <p className="text-xs text-neutral-500 dark:text-white/40 mt-0.5">Total clicks</p>
       </div>
     </div>
   );

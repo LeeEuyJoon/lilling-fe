@@ -1,8 +1,7 @@
 "use client";
 
-import { Button } from "@/components/shadcn/button";
 import { Input } from "@/components/shadcn/input";
-import { Copy, ExternalLink, Pencil } from "lucide-react";
+import { Copy, ExternalLink, Trash2, Pencil } from "lucide-react";
 import { useState } from "react";
 
 interface UrlInfoCardProps {
@@ -14,23 +13,22 @@ interface UrlInfoCardProps {
   };
   onCopy: (shortUrl: string) => void;
   onEdit: (id: string, description: string) => void;
+  clickCount: number;
+  createdAt: string;
+  onDelete: () => void;
 }
 
-export default function UrlInfoCard({ url, onCopy, onEdit }: UrlInfoCardProps) {
+export default function UrlInfoCard({ url, onCopy, onEdit, clickCount, createdAt, onDelete }: UrlInfoCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [description, setDescription] = useState(url.description || "");
 
-  const extractDomain = (urlString: string) => {
+  const getFaviconUrl = (urlString: string) => {
     try {
-      return new URL(urlString).hostname;
+      const domain = new URL(urlString).hostname;
+      return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
     } catch {
       return "";
     }
-  };
-
-  const getFaviconUrl = (urlString: string) => {
-    const domain = extractDomain(urlString);
-    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
   };
 
   const handleEditClick = () => {
@@ -53,94 +51,103 @@ export default function UrlInfoCard({ url, onCopy, onEdit }: UrlInfoCardProps) {
   };
 
   return (
-    <div className="flex-1 min-w-0 border rounded-lg p-3 bg-muted/20">
-      <div className="flex items-start gap-3">
+    <div
+      className="flex-1 min-w-0 border rounded-xl p-3 flex flex-col
+      bg-neutral-50 border-neutral-200
+      dark:bg-white/4 dark:border-white/8"
+    >
+      <div className="flex items-start gap-2.5 flex-1">
         {/* Favicon */}
-        <img
-          src={getFaviconUrl(url.originalUrl)}
-          alt="favicon"
-          className="w-8 h-8 mt-1 flex-shrink-0"
-          onError={(e) => {
-            e.currentTarget.src = "/favicon.ico";
-          }}
-        />
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-neutral-200 dark:bg-white/10 overflow-hidden">
+          <img
+            src={getFaviconUrl(url.originalUrl)}
+            alt="favicon"
+            className="w-5 h-5"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
+          />
+        </div>
 
-        {/* URL 정보 */}
-        <div className="flex-1 min-w-0">
-          {/* 단축 URL + 아이콘 */}
-          <div className="flex items-center gap-2 mb-2">
+        {/* URL info */}
+        <div className="flex-1 min-w-0 flex flex-col h-full">
+          {/* Short URL + action icons */}
+          <div className="flex items-center gap-1.5 mb-0.5">
             <a
               href={`https://${url.shortUrl}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-semibold text-primary hover:underline"
+              className="text-base font-black text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors"
             >
               {url.shortUrl}
             </a>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => window.open(`https://${url.shortUrl}`, "_blank")}
-              title="Open link"
-              className="shrink-0"
-            >
-              <ExternalLink className="size-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
+            <button
               onClick={() => onCopy(url.shortUrl)}
+              className="text-neutral-400 dark:text-white/40 hover:text-neutral-600 dark:hover:text-white/70 p-0.5 rounded transition-colors"
               title="Copy link"
-              className="shrink-0"
             >
-              <Copy className="size-4" />
-            </Button>
+              <Copy size={12} />
+            </button>
+            <button
+              onClick={() => window.open(`https://${url.shortUrl}`, "_blank")}
+              className="text-neutral-400 dark:text-white/40 hover:text-neutral-600 dark:hover:text-white/70 p-0.5 rounded transition-colors"
+              title="Open link"
+            >
+              <ExternalLink size={12} />
+            </button>
           </div>
 
-          {/* 원본 URL */}
-          <p className="text-sm text-muted-foreground truncate mb-3">
+          {/* Original URL */}
+          <p className="text-sm text-neutral-400 dark:text-white/40 truncate mb-2">
             {url.originalUrl}
           </p>
 
-          {/* Description */}
+          {/* Description — inline editable */}
           {isEditing ? (
-            <div>
-              <Input
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onBlur={handleSave}
-                placeholder="Enter description..."
-                className="text-sm"
-                autoFocus
-              />
-            </div>
+            <Input
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onBlur={handleSave}
+              placeholder="Add a description..."
+              className="text-xs md:text-xs h-7 border-dashed bg-white"
+              autoFocus
+            />
           ) : (
             <div
-              className="p-2 border border-dashed rounded bg-muted/30 text-sm cursor-pointer hover:border-primary transition-colors relative group"
+              className="flex items-center justify-between gap-2 border rounded-lg px-2.5 py-1.5 text-xs cursor-pointer transition-colors
+                border-neutral-300 bg-white hover:border-violet-400
+                dark:border-white/20 dark:bg-white/5 dark:hover:border-violet-500/50"
               onClick={handleEditClick}
               title="Click to edit description"
             >
               {url.description ? (
-                <p className="pr-8">{url.description}</p>
+                <span className="text-neutral-700 dark:text-white/70">{url.description}</span>
               ) : (
-                <p className="text-muted-foreground italic pr-8">
-                  Click to add description...
-                </p>
+                <span className="text-neutral-400 dark:text-white/30">Add a description...</span>
               )}
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="absolute right-1 top-1"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleEditClick();
-                }}
-              >
-                <Pencil className="size-3" />
-              </Button>
+              <Pencil size={10} className="shrink-0 text-neutral-400 dark:text-white/30" />
             </div>
           )}
+
+          {/* Footer */}
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-neutral-100 dark:border-white/6">
+            <p className="text-xs text-neutral-400 dark:text-white/40">
+              {new Date(createdAt).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}{" "}
+              · {clickCount} clicks
+            </p>
+            <button
+              onClick={onDelete}
+              className="flex items-center gap-1 text-xs text-neutral-400 dark:text-white/40 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+              title="Delete"
+            >
+              <Trash2 size={11} /> Delete
+            </button>
+          </div>
         </div>
       </div>
     </div>

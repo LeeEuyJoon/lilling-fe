@@ -3,7 +3,7 @@
 import { Button } from "@/components/shadcn/button";
 import { Input } from "@/components/shadcn/input";
 import { useState, FormEvent } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Link2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import KeywordInput from "./KeywordInput";
 
@@ -35,60 +35,66 @@ export default function UrlShortenerForm({
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="rounded-2xl p-7 flex flex-col gap-5 bg-linear-to-br from-violet-500 to-violet-700 shadow-lg shadow-violet-900/30">
+      {/* URL input */}
       <form id="shorten-form" onSubmit={handleSubmit}>
-        <Input
-          type="url"
-          placeholder="https://your-url-to-shorten.com"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          required
-          className="flex-1 border-primary"
-        />
+        <p className="text-white/80 text-sm font-medium mb-2">
+          Paste your long link here
+        </p>
+        <div className="relative">
+          <Link2 className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-violet-400" />
+          <Input
+            type="url"
+            placeholder="https://your-long-url.com"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            required
+            className="h-13 pl-11 text-lg md:text-lg text-violet-900 bg-white border-0 placeholder:text-violet-400/70 focus-visible:ring-2 focus-visible:ring-white/60 shadow-none"
+          />
+        </div>
       </form>
 
-      {/* 2-column: left = keyword(animated) + toggle / right = Convert(fixed) */}
-      <div className="flex items-start gap-2">
-        <div className="flex-1 flex flex-col gap-0.5">
-          <AnimatePresence>
-            {isExpanded && (
-              <motion.div
-                key="keyword-section"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2, ease: "easeInOut" }}
-                className="overflow-hidden"
-              >
-                <div className="pb-0.5">
-                  <KeywordInput
-                    value={keyword}
-                    onChange={setKeyword}
-                    inputWrapperClassName="w-48"
-                    inputClassName="border-primary"
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <motion.button
-            layout
-            type="button"
-            onClick={handleToggle}
-            className="flex items-center gap-1 w-fit text-xs font-medium border border-foreground/60 rounded-full px-2.5 py-1 text-foreground/70 hover:text-foreground hover:border-foreground transition-colors"
+      {/* Keyword section */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            key="keyword-section"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="overflow-hidden"
           >
-            {isExpanded ? <X size={11} /> : <Plus size={11} />}
-            Include a keyword
-          </motion.button>
-        </div>
+            <KeywordInput
+              value={keyword}
+              onChange={setKeyword}
+              onDark={true}
+              inputClassName="bg-white border-0 text-violet-900 placeholder:text-violet-400/60 focus-visible:ring-white/40"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        {/* Convert: overflow-hidden 밖에 있어서 깜빡임 없음, items-start로 keyword 높이와 정렬 */}
+      {/* Bottom: toggle + convert */}
+      <div className="flex items-center gap-2">
+        <motion.button
+          layout
+          type="button"
+          onClick={handleToggle}
+          className="flex items-center gap-1 w-fit text-xs font-medium rounded-full px-2.5 py-1 transition-colors
+            border border-white/40 text-white/80 hover:border-white/70 hover:text-white"
+        >
+          {isExpanded ? <X size={11} /> : <Plus size={11} />}
+          Include a keyword
+        </motion.button>
+
+        <div className="flex-1" />
+
         <Button
           type="submit"
           form="shorten-form"
           disabled={isLoading}
-          className="shrink-0"
+          className="shrink-0 bg-white text-violet-700 hover:bg-violet-50 font-semibold border-0 shadow-none"
         >
           {isLoading ? "Converting..." : "Convert"}
         </Button>

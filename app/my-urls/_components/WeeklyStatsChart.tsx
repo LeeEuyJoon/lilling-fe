@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { ApexOptions } from "apexcharts";
+import { useEffect, useState } from "react";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -15,92 +16,70 @@ interface WeeklyStatsChartProps {
 export default function WeeklyStatsChart({
   recentDailyStats,
 }: WeeklyStatsChartProps) {
-  // 날짜 포맷팅: "2025-01-15" -> "1/15"
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const update = () =>
+      setIsDark(document.documentElement.classList.contains("dark"));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  const labelColor = isDark ? "rgba(255,255,255,0.35)" : "#64748b";
+  const gridColor = isDark ? "rgba(255,255,255,0.07)" : "#e2e8f0";
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return `${date.getMonth() + 1}/${date.getDate()}`;
   };
 
-  // 차트 데이터 준비
   const categories = recentDailyStats.map((stat) => formatDate(stat.date));
   const data = recentDailyStats.map((stat) => stat.clickCount);
 
-  const series = [
-    {
-      name: "Clicks",
-      data: data,
-    },
-  ];
+  const series = [{ name: "Clicks", data }];
 
   const options: ApexOptions = {
     chart: {
       type: "line",
-      height: 100,
-      sparkline: {
-        enabled: false,
-      },
-      toolbar: {
-        show: false,
-      },
-      zoom: {
-        enabled: false,
-      },
+      sparkline: { enabled: false },
+      toolbar: { show: false },
+      zoom: { enabled: false },
+      animations: { enabled: false },
+      background: "transparent",
     },
     stroke: {
       curve: "smooth",
       width: 2,
     },
-    colors: ["#3b82f6"],
+    colors: ["#7c3aed"],
     xaxis: {
-      categories: categories,
+      categories,
       labels: {
-        style: {
-          fontSize: "11px",
-          colors: "#64748b",
-        },
+        style: { fontSize: "11px", colors: labelColor },
       },
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
+      axisBorder: { show: false },
+      axisTicks: { show: false },
     },
     yaxis: {
       labels: {
-        style: {
-          fontSize: "11px",
-          colors: "#64748b",
-        },
+        style: { fontSize: "11px", colors: labelColor },
         formatter: (value) => Math.floor(value).toString(),
       },
     },
     grid: {
-      borderColor: "#e2e8f0",
+      borderColor: gridColor,
       strokeDashArray: 3,
-      xaxis: {
-        lines: {
-          show: false,
-        },
-      },
-      yaxis: {
-        lines: {
-          show: true,
-        },
-      },
-      padding: {
-        top: 0,
-        right: 10,
-        bottom: 0,
-        left: 10,
-      },
+      xaxis: { lines: { show: false } },
+      yaxis: { lines: { show: true } },
+      padding: { top: -10, right: 10, bottom: 0, left: 10 },
     },
-    tooltip: {
-      enabled: false,
-    },
-    dataLabels: {
-      enabled: false,
-    },
+    tooltip: { enabled: false },
+    dataLabels: { enabled: false },
   };
 
   return (

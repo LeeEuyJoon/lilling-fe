@@ -1,28 +1,62 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
+import { Moon, Sun, ArrowRight } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
-  const pathname = usePathname();
-  const isHome = pathname === "/";
+  const { theme, setTheme } = useTheme();
+  const { isAuthenticated, login } = useAuth();
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
-  // 홈페이지에서는 네비게이션 바 숨김
-  if (isHome) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleMyUrls = () => {
+    if (isAuthenticated) {
+      router.push("/my-urls");
+    } else {
+      login("/my-urls");
+    }
+  };
 
   return (
-    <nav className="bg-transparent">
-      <div className="container mx-auto max-w-6xl px-8 py-4">
-        <div className="flex items-center justify-between">
-          {/* Left: Lilling text link */}
-          <Link
-            href="/"
-            className="text-xl font-bold hover:text-primary transition-colors"
-          >
-            Lilling
-          </Link>
+    <nav className="sticky top-4 z-50 px-8 pointer-events-none">
+      <div className="h-11 max-w-5xl mx-auto flex items-center justify-between px-4 rounded-xl border backdrop-blur-sm pointer-events-auto
+        bg-white/90 border-neutral-200 shadow-sm
+        dark:bg-zinc-900/80 dark:border-white/10 dark:shadow-none">
+        {/* Logo */}
+        <Link href="/" className="text-sm font-black text-neutral-900 dark:text-white">
+          lill.<span className="text-violet-600 dark:text-violet-400">ing</span>
+        </Link>
 
-          {/* TODO: 로그아웃 버튼은 백엔드 엔드포인트 추가 후 구현 */}
+        {/* Right side */}
+        <div className="flex items-center gap-2">
+          {/* Theme toggle */}
+          {mounted && (
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 rounded-lg text-neutral-500 hover:text-neutral-900 dark:text-white/40 dark:hover:text-white transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
+            </button>
+          )}
+
+          {/* My URLs button */}
+          <button
+            onClick={handleMyUrls}
+            className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors
+              bg-neutral-900 text-white hover:bg-neutral-700
+              dark:bg-violet-600 dark:text-white dark:hover:bg-violet-500"
+          >
+            My URLs <ArrowRight size={12} />
+          </button>
         </div>
       </div>
     </nav>
