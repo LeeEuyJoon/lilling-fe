@@ -75,13 +75,22 @@ export interface UrlAnalyticsResponse {
 }
 
 /**
+ * 백엔드 에러 응답 타입
+ */
+export interface ApiErrorResponse {
+  code: string;
+  message: string;
+}
+
+/**
  * API 에러 클래스
  */
 export class ApiError extends Error {
   constructor(
     public status: number,
     public statusText: string,
-    message?: string
+    message?: string,
+    public errorCode?: string
   ) {
     super(message || `API Error: ${status} ${statusText}`);
     this.name = "ApiError";
@@ -123,11 +132,14 @@ async function apiFetch<T>(
 
     // 기타 에러 응답
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData: Partial<ApiErrorResponse> = await response
+        .json()
+        .catch(() => ({}));
       throw new ApiError(
         response.status,
         response.statusText,
-        errorData.message || response.statusText
+        errorData.message || response.statusText,
+        errorData.code
       );
     }
 
