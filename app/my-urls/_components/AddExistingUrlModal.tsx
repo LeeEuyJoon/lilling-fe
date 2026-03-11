@@ -110,11 +110,12 @@ export default function AddExistingUrlModal({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-sm p-0 overflow-hidden gap-0
+      <DialogContent className="sm:max-w-lg p-0 overflow-hidden gap-0
+        flex flex-col max-h-[calc(100svh-2rem)]
         bg-white border-neutral-200
         dark:bg-zinc-900 dark:border-white/10">
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 border-b border-neutral-100 dark:border-white/8">
+        <div className="px-6 pt-6 pb-4 border-b border-neutral-100 dark:border-white/8 shrink-0">
           <h2 className="text-lg font-black text-neutral-900 dark:text-white">Add Existing URL</h2>
           <p className="text-sm mt-0.5 text-neutral-500 dark:text-white/40">
             Enter a short code to add it to your list
@@ -122,7 +123,7 @@ export default function AddExistingUrlModal({
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5 flex flex-col gap-3">
+        <div className="px-6 py-5 flex flex-col gap-3 overflow-y-auto">
           <div className="relative">
             <Link2 className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-neutral-400 dark:text-white/30" />
             <Input
@@ -163,7 +164,7 @@ export default function AddExistingUrlModal({
           {verificationState === "success" && verifiedUrl && (
             <div className="border rounded-lg p-3 bg-neutral-50 dark:bg-white/4 border-neutral-200 dark:border-white/8 space-y-2">
               <div className="flex items-start gap-2">
-                <CheckCircle className="size-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-black text-violet-600 dark:text-violet-400">
                     {verifiedUrl.shortUrl}
@@ -180,7 +181,7 @@ export default function AddExistingUrlModal({
 
           {verificationState === "error" && (
             <div className="flex items-start gap-2 text-sm p-3 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
-              <XCircle className="size-4 text-red-500 flex-shrink-0 mt-0.5" />
+              <XCircle className="size-4 text-red-500 shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-red-600 dark:text-red-400">Verification Failed</p>
                 <p className="text-xs mt-0.5 text-red-500 dark:text-red-400/70">{errorMessage}</p>
@@ -190,7 +191,7 @@ export default function AddExistingUrlModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-neutral-100 dark:border-white/8 flex items-center justify-end gap-2">
+        <div className="px-6 py-4 border-t border-neutral-100 dark:border-white/8 flex items-center justify-end gap-2 shrink-0">
           <button
             onClick={handleClose}
             disabled={verificationState === "claiming"}

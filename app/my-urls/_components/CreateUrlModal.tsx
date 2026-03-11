@@ -75,7 +75,7 @@ export default function CreateUrlModal({
   return (
     <>
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-sm p-0 overflow-hidden gap-0
+        <DialogContent className="sm:max-w-lg p-0 overflow-hidden gap-0
           bg-white border-neutral-200
           dark:bg-zinc-900 dark:border-white/10">
           {/* Header */}
