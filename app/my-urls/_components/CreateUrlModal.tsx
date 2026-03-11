@@ -98,7 +98,7 @@ export default function CreateUrlModal({
                     handleShorten();
                   }
                 }}
-                className="pl-10 bg-neutral-50 border-neutral-200 dark:bg-white/5 dark:border-white/10"
+                className="pl-10 bg-neutral-50 border-neutral-200 dark:bg-white/5 dark:border-white/10 dark:text-violet-200 dark:placeholder:text-violet-400/50"
                 disabled={isLoading}
               />
             </div>
@@ -108,6 +108,7 @@ export default function CreateUrlModal({
               disabled={isLoading}
               showIcon
               inputWrapperClassName="w-52"
+              inputClassName="dark:bg-white/5 dark:border-white/10 dark:text-violet-200 dark:placeholder:text-violet-400/50"
             />
           </div>
 
@@ -117,8 +118,8 @@ export default function CreateUrlModal({
               onClick={handleClose}
               disabled={isLoading}
               className="text-sm font-semibold px-4 py-2 rounded-lg border transition-colors
-                border-neutral-200 text-neutral-600 hover:bg-neutral-50
-                dark:border-white/10 dark:text-white/60 dark:hover:border-white/20"
+                border-neutral-300 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-800 hover:border-neutral-400
+                dark:border-white/10 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white/80 dark:hover:border-white/20"
             >
               Cancel
             </button>

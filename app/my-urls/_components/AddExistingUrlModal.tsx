@@ -136,7 +136,7 @@ export default function AddExistingUrlModal({
                   handleVerify();
                 }
               }}
-              className="pl-10 bg-neutral-50 border-neutral-200 dark:bg-white/5 dark:border-white/10"
+              className="pl-10 bg-neutral-50 border-neutral-200 dark:bg-white/5 dark:border-white/10 dark:text-violet-200 dark:placeholder:text-violet-400/50"
               disabled={verificationState === "verifying"}
             />
           </div>
@@ -146,8 +146,8 @@ export default function AddExistingUrlModal({
               onClick={handleVerify}
               disabled={!shortCode.trim()}
               className="w-full text-sm font-semibold py-2 rounded-lg border transition-colors
-                border-neutral-200 text-neutral-600 hover:bg-neutral-50
-                dark:border-white/10 dark:text-white/60 dark:hover:border-white/20
+                bg-violet-50 border-violet-300 text-violet-700 hover:bg-violet-100 hover:border-violet-400 hover:text-violet-800
+                dark:bg-transparent dark:border-white/10 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white/80 dark:hover:border-white/20
                 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Verify URL
@@ -197,7 +197,7 @@ export default function AddExistingUrlModal({
             disabled={verificationState === "claiming"}
             className="text-sm font-semibold px-4 py-2 rounded-lg border transition-colors
               border-neutral-200 text-neutral-600 hover:bg-neutral-50
-              dark:border-white/10 dark:text-white/60 dark:hover:border-white/20
+              dark:border-white/10 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white/80 dark:hover:border-white/20
               disabled:opacity-50"
           >
             Cancel
@@ -223,8 +223,8 @@ export default function AddExistingUrlModal({
             <button
               onClick={() => setVerificationState("idle")}
               className="text-sm font-semibold px-4 py-2 rounded-lg border transition-colors
-                border-neutral-200 text-neutral-600 hover:bg-neutral-50
-                dark:border-white/10 dark:text-white/60 dark:hover:border-white/20"
+                border-neutral-300 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-800 hover:border-neutral-400
+                dark:border-white/10 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white/80 dark:hover:border-white/20"
             >
               Try Again
             </button>
