@@ -30,13 +30,13 @@ export default function Home() {
         <UrlShortenerContainer />
       </div>
 
-      {/* How it works */}
-      <HowItWorks />
-
       {/* My URLs CTA */}
-      <div className="mt-3">
+      <div className="mt-8">
         <MyUrlsButton />
       </div>
+
+      {/* How it works */}
+      <HowItWorks />
 
       {/* GitHub + Email */}
       <div className="flex gap-3 mt-3">

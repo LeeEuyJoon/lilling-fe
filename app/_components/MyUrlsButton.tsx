@@ -46,10 +46,12 @@ export default function MyUrlsButton() {
         onClick={handleClick}
         className="w-full text-left rounded-xl border-2 overflow-hidden transition-all group
             cursor-pointer
-            bg-white border-violet-600 
-            hover:border-violet-300 hover:bg-violet-50
-            dark:bg-zinc-900
-            dark:hover:border-violet-500/40 dark:hover:bg-violet-900/20"
+            shadow-sm
+            bg-white border-violet-600
+            hover:bg-violet-50 hover:shadow-lg hover:shadow-violet-200/60 hover:scale-[1.01]
+            active:scale-[0.99] active:shadow-sm
+            dark:bg-zinc-900 dark:border-violet-500/30
+            dark:hover:border-violet-500/60 dark:hover:bg-violet-900/20 dark:hover:shadow-violet-900/40"
       >
         {/* Top section */}
         <div className="px-6 pt-6 pb-4 flex items-start justify-between gap-4">
@@ -99,6 +101,13 @@ export default function MyUrlsButton() {
         {/* Bottom: decorative chart bar */}
         <div className="px-6 pb-5">
           <MiniBarChart />
+        </div>
+
+        {/* CTA strip */}
+        <div className="flex items-center justify-between px-6 py-3
+          bg-violet-600 group-hover:bg-violet-500 transition-colors">
+          <span className="text-xs font-bold text-white tracking-wide">통계 확인하기</span>
+          <ArrowRight size={14} className="text-white transition-transform group-hover:translate-x-0.5" />
         </div>
       </button>
     </div>

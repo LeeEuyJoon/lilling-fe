@@ -27,11 +27,16 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-4 z-50 px-8 pointer-events-none">
-      <div className="h-11 max-w-5xl mx-auto flex items-center justify-between px-4 rounded-xl border backdrop-blur-sm pointer-events-auto
+      <div
+        className="h-13 max-w-5xl mx-auto flex items-center justify-between px-5 rounded-xl border backdrop-blur-sm pointer-events-auto
         bg-white/90 border-neutral-200 shadow-sm
-        dark:bg-zinc-900/80 dark:border-white/10 dark:shadow-none">
+        dark:bg-zinc-900/80 dark:border-white/10 dark:shadow-none"
+      >
         {/* Logo */}
-        <Link href="/" className="text-sm font-black text-neutral-900 dark:text-white">
+        <Link
+          href="/"
+          className="text-base font-black text-neutral-900 dark:text-white"
+        >
           lill.<span className="text-violet-600 dark:text-violet-400">ing</span>
         </Link>
 
@@ -44,18 +49,18 @@ export default function Navbar() {
               className="p-2 rounded-lg text-neutral-500 hover:text-neutral-900 dark:text-white/40 dark:hover:text-white transition-colors"
               aria-label="Toggle theme"
             >
-              {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
+              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
             </button>
           )}
 
           {/* My URLs button */}
           <button
             onClick={handleMyUrls}
-            className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors
+            className="flex items-center gap-1.5 text-sm font-bold px-4 py-2 rounded-lg transition-colors
               bg-neutral-900 text-white hover:bg-neutral-700
               dark:bg-violet-600 dark:text-white dark:hover:bg-violet-500"
           >
-            My URLs <ArrowRight size={12} />
+            My URLs <ArrowRight size={13} />
           </button>
         </div>
       </div>
