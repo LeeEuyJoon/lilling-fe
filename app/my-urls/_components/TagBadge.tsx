@@ -20,7 +20,7 @@ export default function TagBadge({ tag, onRemove }: TagBadgeProps) {
       <span className="group-hover:opacity-0 transition-opacity">
         {tag.name}
       </span>
-      <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full bg-black/15 dark:bg-black/30">
+      <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg bg-black/15 dark:bg-black/30">
         <X size={10} />
       </span>
     </button>

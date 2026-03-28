@@ -217,10 +217,14 @@ export const api = {
     /**
      * 내 URL 목록 조회 (페이징)
      */
-    list: (page: number = 0, size: number = 10) =>
-      apiFetch<MyUrlsListResponse>(
-        `/api/v1/my-urls/list?page=${page}&size=${size}`
-      ),
+    list: (page: number = 0, size: number = 10, tagIds: string[] = [], filterMode: "or" | "and" = "or") => {
+      const params = new URLSearchParams();
+      params.set("page", String(page));
+      params.set("size", String(size));
+      params.set("filterMode", filterMode);
+      tagIds.forEach((id) => params.append("tagIds", id));
+      return apiFetch<MyUrlsListResponse>(`/api/v1/my-urls/list?${params.toString()}`);
+    },
 
     /**
      * URL 검증 (소유자 확인)
