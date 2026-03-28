@@ -3,6 +3,11 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 /**
  * API 응답 타입 정의
  */
+export interface TagItem {
+  id: string;
+  name: string;
+}
+
 export interface UrlItem {
   id: string;
   shortUrl: string;
@@ -14,6 +19,7 @@ export interface UrlItem {
     date: string; // (YYYY-MM-DD)
     clickCount: number;
   }>;
+  tags?: TagItem[];
 }
 
 export interface MyUrlsListResponse {
@@ -255,5 +261,60 @@ export const api = {
      */
     analytics: (urlId: string) =>
       apiFetch<UrlAnalyticsResponse>(`/api/v1/my-urls/${urlId}/analytics`),
+  },
+
+  /**
+   * 태그 관리 API
+   */
+  tags: {
+    /**
+     * 내 태그 전체 목록 조회
+     */
+    list: () =>
+      apiFetch<{ tags: TagItem[] }>("/api/v1/tags"),
+
+    /**
+     * 태그 생성
+     */
+    create: (name: string) =>
+      apiFetch<TagItem>("/api/v1/tags", {
+        method: "POST",
+        body: JSON.stringify({ name }),
+      }),
+
+    /**
+     * 태그 이름 수정
+     */
+    update: (tagId: string, name: string) =>
+      apiFetch<void>(`/api/v1/tags/${tagId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ name }),
+      }),
+
+    /**
+     * 태그 삭제
+     */
+    delete: (tagId: string) =>
+      apiFetch<void>(`/api/v1/tags/${tagId}`, {
+        method: "DELETE",
+      }),
+
+    /**
+     * URL에 태그 할당
+     */
+    assign: (urlId: string, tagIds: string[]) =>
+      apiFetch<void>("/api/v1/tags/assign", {
+        method: "POST",
+        body: JSON.stringify({ urlId: Number(urlId), tagIds: tagIds.map(Number) }),
+      }),
+
+    /**
+     * URL에서 태그 해제
+     */
+    unassign: (urlId: string, tagIds: string[]) =>
+      apiFetch<void>("/api/v1/tags/unassign", {
+        method: "POST",
+        body: JSON.stringify({ urlId: Number(urlId), tagIds: tagIds.map(Number) }),
+      }),
   },
 };

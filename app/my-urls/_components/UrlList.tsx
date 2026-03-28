@@ -1,6 +1,6 @@
 "use client";
 
-import { UrlItem } from "@/lib/dummyData";
+import { UrlItem, TagItem } from "@/lib/api";
 import UrlCard from "./UrlCard";
 
 interface UrlListProps {
@@ -8,6 +8,10 @@ interface UrlListProps {
   onCopy: (shortUrl: string) => void;
   onEdit: (id: string, description: string) => void;
   onDelete: (id: string) => void;
+  allTags?: TagItem[];
+  onTagAssign?: (urlId: string, tagId: string) => void;
+  onTagUnassign?: (urlId: string, tagId: string) => void;
+  onTagCreated?: (tag: TagItem) => void;
 }
 
 export default function UrlList({
@@ -15,6 +19,10 @@ export default function UrlList({
   onCopy,
   onEdit,
   onDelete,
+  allTags,
+  onTagAssign,
+  onTagUnassign,
+  onTagCreated,
 }: UrlListProps) {
   return (
     <div className="space-y-4">
@@ -25,6 +33,10 @@ export default function UrlList({
           onCopy={onCopy}
           onEdit={onEdit}
           onDelete={onDelete}
+          allTags={allTags}
+          onTagAssign={onTagAssign}
+          onTagUnassign={onTagUnassign}
+          onTagCreated={onTagCreated}
         />
       ))}
     </div>

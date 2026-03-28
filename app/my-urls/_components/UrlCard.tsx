@@ -1,6 +1,6 @@
 "use client";
 
-import { UrlItem } from "@/lib/api";
+import { UrlItem, TagItem } from "@/lib/api";
 import UrlInfoCard from "./UrlInfoCard";
 import WeeklyStatsCard from "./WeeklyStatsCard";
 
@@ -9,6 +9,10 @@ interface UrlCardProps {
   onCopy: (shortUrl: string) => void;
   onEdit: (id: string, description: string) => void;
   onDelete: (id: string) => void;
+  allTags?: TagItem[];
+  onTagAssign?: (urlId: string, tagId: string) => void;
+  onTagUnassign?: (urlId: string, tagId: string) => void;
+  onTagCreated?: (tag: TagItem) => void;
 }
 
 export default function UrlCard({
@@ -16,6 +20,10 @@ export default function UrlCard({
   onCopy,
   onEdit,
   onDelete,
+  allTags,
+  onTagAssign,
+  onTagUnassign,
+  onTagCreated,
 }: UrlCardProps) {
   return (
     <div
@@ -23,9 +31,9 @@ export default function UrlCard({
       bg-white hover:border-violet-300
       dark:bg-zinc-900 dark:border dark:hover:border-violet-500/30"
     >
-      {/* 카드 본문: 좌우 분리 */}
+      {/* Card body: left / right split */}
       <div className="flex items-stretch gap-3">
-        {/* 왼쪽: URL 정보 */}
+        {/* Left: URL info */}
         <UrlInfoCard
           url={url}
           onCopy={onCopy}
@@ -33,9 +41,13 @@ export default function UrlCard({
           clickCount={url.clickCount}
           createdAt={url.createdAt}
           onDelete={() => onDelete(url.id)}
+          allTags={allTags}
+          onTagAssign={onTagAssign}
+          onTagUnassign={onTagUnassign}
+          onTagCreated={onTagCreated}
         />
 
-        {/* 오른쪽: 차트 패널 */}
+        {/* Right: chart panel */}
         {url.recentDailyStats && url.recentDailyStats.length > 0 && (
           <WeeklyStatsCard
             urlId={url.id}

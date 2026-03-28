@@ -4,7 +4,7 @@ import MyUrlsPageHeader from "./_components/MyUrlsPageHeader";
 import UrlList from "./_components/UrlList";
 import EmptyState from "./_components/EmptyState";
 import DeleteConfirmDialog from "./_components/DeleteConfirmDialog";
-import { type UrlItem } from "@/lib/dummyData";
+import { type UrlItem, type TagItem } from "@/lib/api";
 import { Pagination } from "@/components/shadcn/pagination";
 import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
@@ -18,12 +18,13 @@ export default function MyUrlsPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [urls, setUrls] = useState<UrlItem[]>([]);
+  const [allTags, setAllTags] = useState<TagItem[]>([]);
   const [currentPage, setCurrentPage] = useState(0); // 0-based index for backend
   const [totalPages, setTotalPages] = useState(0);
   const [isLoadingUrls, setIsLoadingUrls] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // 인증 확인 및 리다이렉트
+  // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       toast.error("로그인이 필요합니다.");
@@ -31,7 +32,7 @@ export default function MyUrlsPage() {
     }
   }, [isAuthenticated, authLoading, router]);
 
-  // URL 목록 로드
+  // Load URL list
   const loadUrls = async (page: number = 0) => {
     setIsLoadingUrls(true);
     try {
@@ -47,20 +48,31 @@ export default function MyUrlsPage() {
     }
   };
 
-  // 인증 완료 후 URL 목록 로드
+  // Load all tags
+  const loadTags = async () => {
+    try {
+      const response = await api.tags.list();
+      setAllTags(response.tags);
+    } catch (error) {
+      console.error("Failed to load tags:", error);
+    }
+  };
+
+  // Load data after authentication
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
       loadUrls(0);
+      loadTags();
     }
   }, [authLoading, isAuthenticated]);
 
-  // 삭제할 URL 찾기
+  // Find URL to delete
   const deletingUrl = useMemo(
     () => urls.find((url) => url.id === deletingId),
     [urls, deletingId]
   );
 
-  // 로딩 중이거나 인증되지 않은 경우 렌더링하지 않음
+  // Do not render if loading or not authenticated
   if (authLoading || !isAuthenticated) {
     return null;
   }
@@ -73,7 +85,6 @@ export default function MyUrlsPage() {
   const handleEdit = async (id: string, description: string) => {
     try {
       await api.myUrls.updateDescription(id, description);
-      // 로컬 상태 업데이트
       setUrls((prevUrls) =>
         prevUrls.map((url) => (url.id === id ? { ...url, description } : url))
       );
@@ -104,15 +115,44 @@ export default function MyUrlsPage() {
   };
 
   const handlePageChange = (page: number) => {
-    // shadcn Pagination은 1-based, 백엔드는 0-based
+    // shadcn Pagination is 1-based, backend is 0-based
     loadUrls(page - 1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleAddUrl = () => {
-    // 목록 새로고침 (첫 페이지로)
     loadUrls(0);
     toast.success("URL added successfully!");
+  };
+
+  const handleTagAssign = (urlId: string, tagId: string) => {
+    const tag = allTags.find((t) => t.id === tagId);
+    if (!tag) return;
+    setUrls((prevUrls) =>
+      prevUrls.map((url) => {
+        if (url.id !== urlId) return url;
+        const already = (url.tags || []).some((t) => t.id === tagId);
+        if (already) return url;
+        return { ...url, tags: [...(url.tags || []), tag] };
+      })
+    );
+  };
+
+  const handleTagUnassign = (urlId: string, tagId: string) => {
+    setUrls((prevUrls) =>
+      prevUrls.map((url) => {
+        if (url.id !== urlId) return url;
+        return { ...url, tags: (url.tags || []).filter((t) => t.id !== tagId) };
+      })
+    );
+  };
+
+  const handleTagCreated = (tag: TagItem) => {
+    setAllTags((prev) => {
+      const exists = prev.some((t) => t.id === tag.id);
+      if (exists) return prev;
+      return [...prev, tag];
+    });
   };
 
   return (
@@ -132,6 +172,10 @@ export default function MyUrlsPage() {
             onCopy={handleCopy}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            allTags={allTags}
+            onTagAssign={handleTagAssign}
+            onTagUnassign={handleTagUnassign}
+            onTagCreated={handleTagCreated}
           />
           {totalPages > 1 && (
             <Pagination
@@ -143,7 +187,7 @@ export default function MyUrlsPage() {
         </>
       )}
 
-      {/* 삭제 확인 모달 */}
+      {/* Delete confirmation modal */}
       <DeleteConfirmDialog
         open={!!deletingId}
         onOpenChange={(open) => !open && setDeletingId(null)}

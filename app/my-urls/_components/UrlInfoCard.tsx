@@ -3,6 +3,11 @@
 import { Input } from "@/components/shadcn/input";
 import { Copy, ExternalLink, Trash2, Pencil } from "lucide-react";
 import { useState } from "react";
+import { type TagItem } from "@/lib/api";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
+import TagBadge from "./TagBadge";
+import TagSelector from "./TagSelector";
 
 interface UrlInfoCardProps {
   url: {
@@ -10,17 +15,38 @@ interface UrlInfoCardProps {
     shortUrl: string;
     originalUrl: string;
     description?: string;
+    tags?: TagItem[];
   };
   onCopy: (shortUrl: string) => void;
   onEdit: (id: string, description: string) => void;
   clickCount: number;
   createdAt: string;
   onDelete: () => void;
+  allTags?: TagItem[];
+  onTagAssign?: (urlId: string, tagId: string) => void;
+  onTagUnassign?: (urlId: string, tagId: string) => void;
+  onTagCreated?: (tag: TagItem) => void;
 }
 
-export default function UrlInfoCard({ url, onCopy, onEdit, clickCount, createdAt, onDelete }: UrlInfoCardProps) {
+export default function UrlInfoCard({
+  url,
+  onCopy,
+  onEdit,
+  clickCount,
+  createdAt,
+  onDelete,
+  allTags = [],
+  onTagAssign,
+  onTagUnassign,
+  onTagCreated,
+}: UrlInfoCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [description, setDescription] = useState(url.description || "");
+
+  const assignedTagIds = new Set((url.tags || []).map((t) => t.id));
+  const assignedTags = url.tags || [];
+  const visibleTags = assignedTags.slice(0, 3);
+  const overflowCount = assignedTags.length - visibleTags.length;
 
   const getFaviconUrl = (urlString: string) => {
     try {
@@ -50,6 +76,16 @@ export default function UrlInfoCard({ url, onCopy, onEdit, clickCount, createdAt
     }
   };
 
+  const handleUnassignTag = async (e: React.MouseEvent, tag: TagItem) => {
+    e.stopPropagation();
+    try {
+      await api.tags.unassign(url.id, [tag.id]);
+      onTagUnassign?.(url.id, tag.id);
+    } catch {
+      toast.error("태그를 해제하는데 실패했습니다.");
+    }
+  };
+
   return (
     <div
       className="flex-1 min-w-0 border rounded-xl p-3 flex flex-col
@@ -71,30 +107,56 @@ export default function UrlInfoCard({ url, onCopy, onEdit, clickCount, createdAt
 
         {/* URL info */}
         <div className="flex-1 min-w-0 flex flex-col h-full">
-          {/* Short URL + action icons */}
-          <div className="flex items-center gap-1.5 mb-0.5">
+          {/* Short URL + action icons + tags (same row) */}
+          <div className="flex items-center gap-1.5 mb-0.5 min-w-0">
+            {/* Left: shortUrl + action buttons */}
             <a
               href={`https://${url.shortUrl}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-base font-black text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors"
+              className="text-base font-black text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors shrink-0"
             >
               {url.shortUrl}
             </a>
             <button
               onClick={() => onCopy(url.shortUrl)}
-              className="text-neutral-400 dark:text-white/40 hover:text-neutral-600 dark:hover:text-white/70 p-0.5 rounded transition-colors"
+              className="text-neutral-400 dark:text-white/40 hover:text-neutral-600 dark:hover:text-white/70 p-0.5 rounded transition-colors shrink-0"
               title="Copy link"
             >
               <Copy size={12} />
             </button>
             <button
               onClick={() => window.open(`https://${url.shortUrl}`, "_blank")}
-              className="text-neutral-400 dark:text-white/40 hover:text-neutral-600 dark:hover:text-white/70 p-0.5 rounded transition-colors"
+              className="text-neutral-400 dark:text-white/40 hover:text-neutral-600 dark:hover:text-white/70 p-0.5 rounded transition-colors shrink-0"
               title="Open link"
             >
               <ExternalLink size={12} />
             </button>
+
+            {/* Right: tags + add tag button */}
+            <div className="ml-auto flex items-center gap-1 shrink-0">
+              {/* Visible tags (max 3) */}
+              {visibleTags.map((tag) => (
+                <TagBadge key={tag.id} tag={tag} onRemove={handleUnassignTag} />
+              ))}
+
+              {/* Overflow count */}
+              {overflowCount > 0 && (
+                <span className="inline-flex items-center text-xs px-1.5 py-0.5 rounded-full bg-neutral-100 dark:bg-white/8 text-neutral-500 dark:text-white/40 border border-neutral-200 dark:border-white/10">
+                  +{overflowCount}
+                </span>
+              )}
+
+              <TagSelector
+                urlId={url.id}
+                allTags={allTags}
+                assignedTagIds={assignedTagIds}
+                hasAssignedTags={assignedTags.length > 0}
+                onTagAssign={onTagAssign ?? (() => {})}
+                onTagUnassign={onTagUnassign ?? (() => {})}
+                onTagCreated={onTagCreated ?? (() => {})}
+              />
+            </div>
           </div>
 
           {/* Original URL */}
