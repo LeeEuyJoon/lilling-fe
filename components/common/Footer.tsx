@@ -6,7 +6,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-neutral-200 dark:border-white/8 mt-auto">
       <div className="container mx-auto max-w-5xl px-8 py-5">
-        <div className="flex items-center justify-center gap-6 text-xs text-neutral-400 dark:text-white/30">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-xs text-neutral-400 dark:text-white/30">
           <Link
             href="https://github.com/LeeEuyJoon/lilling-be"
             target="_blank"

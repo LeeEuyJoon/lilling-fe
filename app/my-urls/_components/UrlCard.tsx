@@ -32,7 +32,7 @@ export default function UrlCard({
       dark:bg-zinc-900 dark:border dark:hover:border-violet-500/30"
     >
       {/* Card body: left / right split */}
-      <div className="flex items-stretch gap-3">
+      <div className="flex flex-col sm:flex-row items-stretch gap-3">
         {/* Left: URL info */}
         <UrlInfoCard
           url={url}

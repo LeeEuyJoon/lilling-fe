@@ -49,7 +49,7 @@ export default function WeeklyStatsCard({
   return (
     <>
       <div
-        className="w-56 shrink-0 border rounded-xl px-2 pt-1.5 pb-1 flex flex-col gap-0 cursor-pointer group transition-colors min-h-0
+        className="w-full sm:w-56 sm:shrink-0 border rounded-xl px-2 pt-1.5 pb-1 flex flex-col gap-0 cursor-pointer group transition-colors min-h-0
           bg-neutral-50 border-neutral-200 hover:border-violet-300
           dark:bg-white/4 dark:border-white/8 dark:hover:border-violet-500/30"
         onClick={handleOpenAnalytics}

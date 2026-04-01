@@ -115,7 +115,7 @@ export default function AddExistingUrlModal({
         bg-white border-neutral-200
         dark:bg-zinc-900 dark:border-white/10">
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 border-b border-neutral-100 dark:border-white/8 shrink-0">
+        <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-4 border-b border-neutral-100 dark:border-white/8 shrink-0">
           <h2 className="text-lg font-black text-neutral-900 dark:text-white">Add Existing URL</h2>
           <p className="text-sm mt-0.5 text-neutral-500 dark:text-white/40">
             Enter a short code to add it to your list
@@ -123,7 +123,7 @@ export default function AddExistingUrlModal({
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5 flex flex-col gap-3 overflow-y-auto">
+        <div className="px-4 sm:px-6 py-5 flex flex-col gap-3 overflow-y-auto">
           <div className="relative">
             <Link2 className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-neutral-400 dark:text-white/30" />
             <Input
@@ -191,7 +191,7 @@ export default function AddExistingUrlModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-neutral-100 dark:border-white/8 flex items-center justify-end gap-2 shrink-0">
+        <div className="px-4 sm:px-6 py-4 border-t border-neutral-100 dark:border-white/8 flex items-center justify-end gap-2 shrink-0">
           <button
             onClick={handleClose}
             disabled={verificationState === "claiming"}

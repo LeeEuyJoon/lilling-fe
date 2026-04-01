@@ -79,13 +79,13 @@ export default function CreateUrlModal({
           bg-white border-neutral-200
           dark:bg-zinc-900 dark:border-white/10">
           {/* Header */}
-          <div className="px-6 pt-6 pb-4 border-b border-neutral-100 dark:border-white/8">
+          <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-4 border-b border-neutral-100 dark:border-white/8">
             <h2 className="text-lg font-black text-neutral-900 dark:text-white">Create Short URL</h2>
             <p className="text-sm mt-0.5 text-neutral-500 dark:text-white/40">Enter a long URL to shorten it</p>
           </div>
 
           {/* Body */}
-          <div className="px-6 py-5 flex flex-col gap-4">
+          <div className="px-4 sm:px-6 py-5 flex flex-col gap-4">
             <div className="relative">
               <Link2 className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-neutral-400 dark:text-white/30" />
               <Input
@@ -107,13 +107,13 @@ export default function CreateUrlModal({
               onChange={setKeyword}
               disabled={isLoading}
               showIcon
-              inputWrapperClassName="w-52"
+              inputWrapperClassName="w-full sm:w-52"
               inputClassName="dark:bg-white/5 dark:border-white/10 dark:text-violet-200 dark:placeholder:text-violet-400/50"
             />
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-neutral-100 dark:border-white/8 flex items-center justify-end gap-2">
+          <div className="px-4 sm:px-6 py-4 border-t border-neutral-100 dark:border-white/8 flex items-center justify-end gap-2">
             <button
               onClick={handleClose}
               disabled={isLoading}

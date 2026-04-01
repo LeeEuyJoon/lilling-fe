@@ -35,7 +35,7 @@ export default function UrlShortenerForm({
   };
 
   return (
-    <div className="rounded-2xl p-7 flex flex-col gap-5 bg-linear-to-br from-violet-500 to-violet-700 shadow-lg shadow-violet-900/30">
+    <div className="rounded-2xl p-5 sm:p-7 flex flex-col gap-5 bg-linear-to-br from-violet-500 to-violet-700 shadow-lg shadow-violet-900/30">
       {/* URL input */}
       <form id="shorten-form" onSubmit={handleSubmit}>
         <p className="text-white/80 text-sm font-medium mb-2">
@@ -49,7 +49,7 @@ export default function UrlShortenerForm({
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             required
-            className="h-13 pl-11 text-lg md:text-lg text-violet-900 bg-white border-0 placeholder:text-violet-400/70 focus-visible:ring-2 focus-visible:ring-white/60 shadow-none"
+            className="h-13 pl-11 text-base sm:text-lg text-violet-900 bg-white border-0 placeholder:text-violet-400/70 focus-visible:ring-2 focus-visible:ring-white/60 shadow-none"
           />
         </div>
       </form>
@@ -76,7 +76,7 @@ export default function UrlShortenerForm({
       </AnimatePresence>
 
       {/* Bottom: toggle + convert */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
         <motion.button
           layout
           type="button"
@@ -88,13 +88,13 @@ export default function UrlShortenerForm({
           Include a keyword
         </motion.button>
 
-        <div className="flex-1" />
+        <div className="hidden sm:block flex-1" />
 
         <Button
           type="submit"
           form="shorten-form"
           disabled={isLoading}
-          className="shrink-0 bg-white text-violet-700 hover:bg-violet-50 font-semibold border-0 shadow-none"
+          className="w-full sm:w-auto shrink-0 bg-white text-violet-700 hover:bg-violet-50 font-semibold border-0 shadow-none"
         >
           {isLoading ? "Converting..." : "Convert"}
         </Button>

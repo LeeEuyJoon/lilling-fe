@@ -26,9 +26,9 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-4 z-50 px-8 pointer-events-none">
+    <nav className="sticky top-4 z-50 px-3 sm:px-8 pointer-events-none">
       <div
-        className="h-13 max-w-5xl mx-auto flex items-center justify-between px-5 rounded-xl border backdrop-blur-sm pointer-events-auto
+        className="h-13 max-w-5xl mx-auto flex items-center justify-between px-4 sm:px-5 rounded-xl border backdrop-blur-sm pointer-events-auto
         bg-white/90 border-neutral-200 shadow-sm
         dark:bg-zinc-900/80 dark:border-white/10 dark:shadow-none"
       >

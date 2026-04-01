@@ -116,7 +116,7 @@ export default function AnalyticsModal({
   if (!analyticsData) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-5xl">
+        <DialogContent className="sm:max-w-5xl w-[calc(100vw-2rem)] sm:w-auto">
           <DialogHeader>
             <div className="flex items-center gap-3">
               <img
@@ -276,7 +276,7 @@ export default function AnalyticsModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-5xl max-h-[90svh] overflow-y-auto w-[calc(100vw-2rem)] sm:w-auto">
         <DialogHeader>
           <div className="flex items-center gap-3">
             <img
@@ -322,34 +322,35 @@ export default function AnalyticsModal({
               options={options}
               series={series}
               type="area"
-              height={350}
+              height={250}
+              width="100%"
             />
           </div>
 
           {/* 통계 요약 */}
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             {/* 전체 클릭 수 - 바이올렛 강조 */}
             <div className="rounded-xl p-4 border border-violet-200 dark:border-violet-500/20 bg-violet-50 dark:bg-violet-500/5">
               <p className="text-xs text-neutral-500 dark:text-white/40">전체 클릭 수</p>
-              <p className="text-2xl font-black text-violet-700 dark:text-violet-400 mt-1">
+              <p className="text-xl sm:text-2xl font-black text-violet-700 dark:text-violet-400 mt-1">
                 {totalClickCount.toLocaleString()}
               </p>
             </div>
             <div className="rounded-xl p-4 border border-neutral-200 dark:border-white/8 bg-neutral-50 dark:bg-white/4">
               <p className="text-xs text-neutral-500 dark:text-white/40">{getPeriodText()}의 총 클릭</p>
-              <p className="text-2xl font-black text-neutral-900 dark:text-white mt-1">
+              <p className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mt-1">
                 {periodClicks.toLocaleString()}
               </p>
             </div>
             <div className="rounded-xl p-4 border border-neutral-200 dark:border-white/8 bg-neutral-50 dark:bg-white/4">
               <p className="text-xs text-neutral-500 dark:text-white/40">{getPeriodText()}의 평균</p>
-              <p className="text-2xl font-black text-neutral-900 dark:text-white mt-1">
+              <p className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mt-1">
                 {avgClicks.toFixed(1)}
               </p>
             </div>
             <div className="rounded-xl p-4 border border-neutral-200 dark:border-white/8 bg-neutral-50 dark:bg-white/4">
               <p className="text-xs text-neutral-500 dark:text-white/40">{getPeriodText()}의 최대</p>
-              <p className="text-2xl font-black text-neutral-900 dark:text-white mt-1">
+              <p className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mt-1">
                 {maxClicks.toLocaleString()}
               </p>
             </div>

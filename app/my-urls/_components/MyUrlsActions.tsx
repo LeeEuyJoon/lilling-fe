@@ -15,10 +15,10 @@ export default function MyUrlsActions({ onAddUrl }: MyUrlsActionsProps) {
 
   return (
     <>
-      <div className="flex gap-2">
+      <div className="flex gap-2 w-full sm:w-auto">
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="flex items-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-lg transition-colors
+          className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-lg transition-colors
             bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-900/20 dark:shadow-violet-900/40"
         >
           <Plus size={14} />
@@ -26,7 +26,7 @@ export default function MyUrlsActions({ onAddUrl }: MyUrlsActionsProps) {
         </button>
         <button
           onClick={() => setIsAddExistingModalOpen(true)}
-          className="flex items-center gap-1.5 text-sm font-semibold px-3.5 py-2 rounded-lg border transition-colors
+          className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 text-sm font-semibold px-3.5 py-2 rounded-lg border transition-colors
             bg-white border-neutral-200 text-neutral-600 hover:bg-neutral-100 hover:border-neutral-400 hover:text-neutral-800
             dark:bg-zinc-900 dark:border-white/10 dark:text-white/70 dark:hover:bg-zinc-800 dark:hover:border-white/20"
         >

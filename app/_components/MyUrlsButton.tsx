@@ -54,7 +54,7 @@ export default function MyUrlsButton() {
             dark:hover:border-violet-500/60 dark:hover:bg-violet-900/20 dark:hover:shadow-violet-900/40"
       >
         {/* Top section */}
-        <div className="px-6 pt-6 pb-4 flex items-start justify-between gap-4">
+        <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 flex items-start justify-between gap-4">
           {/* Left: text */}
           <div className="flex-1">
             <div className="flex items-center gap-1.5 mb-1">
@@ -88,7 +88,7 @@ export default function MyUrlsButton() {
 
         {/* Feature pills */}
         <div className="pb-4 flex items-center gap-2 flex-wrap">
-          <div className="px-6 pb-4 flex items-center gap-2 flex-wrap">
+          <div className="px-4 sm:px-6 pb-3 sm:pb-4 flex items-center gap-2 flex-wrap">
             <MyUrlsFeature icon={Link2} label="URL 관리" />
             <MyUrlsFeature icon={MousePointerClick} label="클릭 통계" />
             <MyUrlsFeature
@@ -99,12 +99,12 @@ export default function MyUrlsButton() {
         </div>
 
         {/* Bottom: decorative chart bar */}
-        <div className="px-6 pb-5">
+        <div className="px-4 sm:px-6 pb-4 sm:pb-5">
           <MiniBarChart />
         </div>
 
         {/* CTA strip */}
-        <div className="flex items-center justify-between px-6 py-3
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3
           bg-violet-600 group-hover:bg-violet-500 transition-colors">
           <span className="text-xs font-bold text-white tracking-wide">통계 확인하기</span>
           <ArrowRight size={14} className="text-white transition-transform group-hover:translate-x-0.5" />

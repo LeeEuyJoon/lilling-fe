@@ -25,7 +25,7 @@ export default function DeleteConfirmDialog({
         bg-white border-neutral-200
         dark:bg-zinc-900 dark:border-white/10">
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 border-b border-neutral-100 dark:border-white/8">
+        <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-4 border-b border-neutral-100 dark:border-white/8">
           <div className="flex items-center gap-2.5 mb-1">
             <div className="p-1.5 rounded-lg bg-red-50 dark:bg-red-500/15">
               <AlertTriangle size={15} className="text-red-500" />

@@ -5,7 +5,7 @@ import { StepArrow } from "./StepArrow";
 export default function HowItWorks() {
   return (
     <div className="mt-10 mb-10">
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
         {/* Step 1 */}
         <WorkStep
           number="01"

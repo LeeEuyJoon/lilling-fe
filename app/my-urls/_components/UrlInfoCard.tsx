@@ -108,33 +108,35 @@ export default function UrlInfoCard({
         {/* URL info */}
         <div className="flex-1 min-w-0 flex flex-col h-full">
           {/* Short URL + action icons + tags (same row) */}
-          <div className="flex items-center gap-1.5 mb-0.5 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-0.5 min-w-0">
             {/* Left: shortUrl + action buttons */}
-            <a
-              href={`https://${url.shortUrl}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-base font-black text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors shrink-0"
-            >
-              {url.shortUrl}
-            </a>
-            <button
-              onClick={() => onCopy(url.shortUrl)}
-              className="text-neutral-400 dark:text-white/40 hover:text-neutral-600 dark:hover:text-white/70 p-0.5 rounded transition-colors shrink-0"
-              title="Copy link"
-            >
-              <Copy size={12} />
-            </button>
-            <button
-              onClick={() => window.open(`https://${url.shortUrl}`, "_blank")}
-              className="text-neutral-400 dark:text-white/40 hover:text-neutral-600 dark:hover:text-white/70 p-0.5 rounded transition-colors shrink-0"
-              title="Open link"
-            >
-              <ExternalLink size={12} />
-            </button>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <a
+                href={`https://${url.shortUrl}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="min-w-0 truncate text-base font-black text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors"
+              >
+                {url.shortUrl}
+              </a>
+              <button
+                onClick={() => onCopy(url.shortUrl)}
+                className="text-neutral-400 dark:text-white/40 hover:text-neutral-600 dark:hover:text-white/70 p-0.5 rounded transition-colors shrink-0"
+                title="Copy link"
+              >
+                <Copy size={12} />
+              </button>
+              <button
+                onClick={() => window.open(`https://${url.shortUrl}`, "_blank")}
+                className="text-neutral-400 dark:text-white/40 hover:text-neutral-600 dark:hover:text-white/70 p-0.5 rounded transition-colors shrink-0"
+                title="Open link"
+              >
+                <ExternalLink size={12} />
+              </button>
+            </div>
 
             {/* Right: tags + add tag button */}
-            <div className="ml-auto flex items-center gap-1 shrink-0">
+            <div className="flex items-center gap-1 flex-wrap sm:flex-nowrap sm:ml-auto">
               {/* Visible tags (max 3) */}
               {visibleTags.map((tag) => (
                 <TagBadge key={tag.id} tag={tag} onRemove={handleUnassignTag} />
@@ -193,8 +195,8 @@ export default function UrlInfoCard({
           )}
 
           {/* Footer */}
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-neutral-100 dark:border-white/6">
-            <p className="text-xs text-neutral-400 dark:text-white/40">
+          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between mt-2 pt-2 border-t border-neutral-100 dark:border-white/6">
+            <p className="text-xs text-neutral-400 dark:text-white/40 truncate">
               {new Date(createdAt).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
