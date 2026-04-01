@@ -44,7 +44,7 @@ export default function UrlInfoCard({
   const [description, setDescription] = useState(url.description || "");
 
   const assignedTagIds = new Set((url.tags || []).map((t) => t.id));
-  const assignedTags = url.tags || [];
+  const assignedTags = (url.tags ?? []).slice().sort((a, b) => parseInt(a.id) - parseInt(b.id));
   const visibleTags = assignedTags.slice(0, 3);
   const overflowCount = assignedTags.length - visibleTags.length;
 
