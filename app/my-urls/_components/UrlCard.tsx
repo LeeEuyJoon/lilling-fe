@@ -1,6 +1,6 @@
 "use client";
 
-import { UrlItem, TagItem } from "@/lib/api";
+import { UrlItem } from "@/lib/api";
 import UrlInfoCard from "./UrlInfoCard";
 import WeeklyStatsCard from "./WeeklyStatsCard";
 
@@ -9,10 +9,6 @@ interface UrlCardProps {
   onCopy: (shortUrl: string) => void;
   onEdit: (id: string, description: string) => void;
   onDelete: (id: string) => void;
-  allTags?: TagItem[];
-  onTagAssign?: (urlId: string, tagId: string) => void;
-  onTagUnassign?: (urlId: string, tagId: string) => void;
-  onTagCreated?: (tag: TagItem) => void;
 }
 
 export default function UrlCard({
@@ -20,10 +16,6 @@ export default function UrlCard({
   onCopy,
   onEdit,
   onDelete,
-  allTags,
-  onTagAssign,
-  onTagUnassign,
-  onTagCreated,
 }: UrlCardProps) {
   return (
     <div
@@ -41,10 +33,6 @@ export default function UrlCard({
           clickCount={url.clickCount}
           createdAt={url.createdAt}
           onDelete={() => onDelete(url.id)}
-          allTags={allTags}
-          onTagAssign={onTagAssign}
-          onTagUnassign={onTagUnassign}
-          onTagCreated={onTagCreated}
         />
 
         {/* Right: chart panel */}

@@ -4,7 +4,7 @@ import { useState } from "react";
 import WeeklyStatsChart from "./WeeklyStatsChart";
 import { BarChart2, TrendingUp } from "lucide-react";
 import AnalyticsModal from "./AnalyticsModal";
-import { api, type UrlAnalyticsResponse } from "@/lib/api";
+import { useUrlAnalytics } from "@/lib/queries/url.queries";
 import { toast } from "sonner";
 
 interface WeeklyStatsCardProps {
@@ -26,24 +26,16 @@ export default function WeeklyStatsCard({
   recentDailyStats,
 }: WeeklyStatsCardProps) {
   const [showAnalytics, setShowAnalytics] = useState(false);
-  const [analyticsData, setAnalyticsData] =
-    useState<UrlAnalyticsResponse | null>(null);
 
-  const handleOpenAnalytics = async () => {
+  const { data: analyticsData, error } = useUrlAnalytics(urlId, showAnalytics);
+
+  // Show toast on fetch error (only when modal is open)
+  if (error && showAnalytics) {
+    toast.error("통계 데이터를 불러오는데 실패했습니다.");
+  }
+
+  const handleOpenAnalytics = () => {
     setShowAnalytics(true);
-
-    if (analyticsData) {
-      return;
-    }
-
-    try {
-      const data = await api.myUrls.analytics(urlId);
-      setAnalyticsData(data);
-    } catch (error) {
-      console.error("Failed to fetch analytics:", error);
-      toast.error("통계 데이터를 불러오는데 실패했습니다.");
-      setShowAnalytics(false);
-    }
   };
 
   return (
@@ -76,7 +68,7 @@ export default function WeeklyStatsCard({
         shortUrl={shortUrl}
         originalUrl={originalUrl}
         totalClickCount={totalClickCount}
-        analyticsData={analyticsData}
+        analyticsData={analyticsData ?? null}
       />
     </>
   );

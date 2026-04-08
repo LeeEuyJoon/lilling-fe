@@ -4,10 +4,10 @@ import { Input } from "@/components/shadcn/input";
 import { Copy, ExternalLink, Trash2, Pencil } from "lucide-react";
 import { useState } from "react";
 import { type TagItem } from "@/lib/api";
-import { api } from "@/lib/api";
 import { toast } from "sonner";
 import TagBadge from "./TagBadge";
 import TagSelector from "./TagSelector";
+import { useUnassignTag } from "@/lib/queries/tag.queries";
 
 interface UrlInfoCardProps {
   url: {
@@ -22,10 +22,6 @@ interface UrlInfoCardProps {
   clickCount: number;
   createdAt: string;
   onDelete: () => void;
-  allTags?: TagItem[];
-  onTagAssign?: (urlId: string, tagId: string) => void;
-  onTagUnassign?: (urlId: string, tagId: string) => void;
-  onTagCreated?: (tag: TagItem) => void;
 }
 
 export default function UrlInfoCard({
@@ -35,16 +31,16 @@ export default function UrlInfoCard({
   clickCount,
   createdAt,
   onDelete,
-  allTags = [],
-  onTagAssign,
-  onTagUnassign,
-  onTagCreated,
 }: UrlInfoCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [description, setDescription] = useState(url.description || "");
 
+  const unassignTag = useUnassignTag();
+
   const assignedTagIds = new Set((url.tags || []).map((t) => t.id));
-  const assignedTags = (url.tags ?? []).slice().sort((a, b) => parseInt(a.id) - parseInt(b.id));
+  const assignedTags = (url.tags ?? [])
+    .slice()
+    .sort((a, b) => parseInt(a.id) - parseInt(b.id));
   const visibleTags = assignedTags.slice(0, 3);
   const overflowCount = assignedTags.length - visibleTags.length;
 
@@ -79,8 +75,7 @@ export default function UrlInfoCard({
   const handleUnassignTag = async (e: React.MouseEvent, tag: TagItem) => {
     e.stopPropagation();
     try {
-      await api.tags.unassign(url.id, [tag.id]);
-      onTagUnassign?.(url.id, tag.id);
+      await unassignTag.mutateAsync({ urlId: url.id, tagIds: [tag.id] });
     } catch {
       toast.error("태그를 해제하는데 실패했습니다.");
     }
@@ -151,12 +146,8 @@ export default function UrlInfoCard({
 
               <TagSelector
                 urlId={url.id}
-                allTags={allTags}
                 assignedTagIds={assignedTagIds}
                 hasAssignedTags={assignedTags.length > 0}
-                onTagAssign={onTagAssign ?? (() => {})}
-                onTagUnassign={onTagUnassign ?? (() => {})}
-                onTagCreated={onTagCreated ?? (() => {})}
               />
             </div>
           </div>
@@ -186,11 +177,18 @@ export default function UrlInfoCard({
               title="Click to edit description"
             >
               {url.description ? (
-                <span className="text-neutral-700 dark:text-white/70">{url.description}</span>
+                <span className="text-neutral-700 dark:text-white/70">
+                  {url.description}
+                </span>
               ) : (
-                <span className="text-neutral-400 dark:text-white/30">Add a description...</span>
+                <span className="text-neutral-400 dark:text-white/30">
+                  Add a description...
+                </span>
               )}
-              <Pencil size={10} className="shrink-0 text-neutral-400 dark:text-white/30" />
+              <Pencil
+                size={10}
+                className="shrink-0 text-neutral-400 dark:text-white/30"
+              />
             </div>
           )}
 

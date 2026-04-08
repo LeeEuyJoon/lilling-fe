@@ -4,9 +4,9 @@ import "./globals.css";
 import Footer from "@/components/common/Footer";
 import Navbar from "@/components/common/Navbar";
 import { Toaster } from "@/components/shadcn/sonner";
-import { AuthProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "next-themes";
 import ParticlesBackground from "./_components/ParticlesBackground";
+import Providers from "./_components/Providers";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -34,12 +34,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ParticlesBackground />
-          <AuthProvider>
+          <Providers>
             <Navbar />
             <div className="flex-1">{children}</div>
             <Footer />
             <Toaster />
-          </AuthProvider>
+          </Providers>
         </ThemeProvider>
       </body>
     </html>

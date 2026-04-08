@@ -1,30 +1,30 @@
 "use client";
 
+import { useState, useMemo } from "react";
+import { useEffect } from "react";
+import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
 import MyUrlsPageHeader from "./_components/MyUrlsPageHeader";
 import UrlList from "./_components/UrlList";
 import EmptyState from "./_components/EmptyState";
 import DeleteConfirmDialog from "./_components/DeleteConfirmDialog";
 import TagFilter, { type TagFilterMode } from "./_components/TagFilter";
-import { type UrlItem, type TagItem } from "@/lib/api";
 import { Pagination } from "@/components/shadcn/pagination";
-import { useState, useMemo, useEffect } from "react";
-import { toast } from "sonner";
-import { useAuth } from "@/lib/auth-context";
-import { useRouter } from "next/navigation";
-import { api } from "@/lib/api";
+import { useMyUrlsList, useDeleteUrl, useUpdateDescription } from "@/lib/queries/url.queries";
 
 const PAGE_SIZE = 10;
 
 export default function MyUrlsPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const [urls, setUrls] = useState<UrlItem[]>([]);
-  const [allTags, setAllTags] = useState<TagItem[]>([]);
+
+  // Filter state (only these remain as useState)
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [filterMode, setFilterMode] = useState<TagFilterMode>("or");
-  const [currentPage, setCurrentPage] = useState(0); // 0-based index for backend
-  const [totalPages, setTotalPages] = useState(0);
-  const [isLoadingUrls, setIsLoadingUrls] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0); // 0-based for backend
+
+  // Delete dialog state
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Redirect if not authenticated
@@ -35,41 +35,23 @@ export default function MyUrlsPage() {
     }
   }, [isAuthenticated, authLoading, router]);
 
-  // Load URL list
-  const loadUrls = async (page: number = 0, tagIds?: string[], mode?: TagFilterMode) => {
-    const ids = tagIds ?? selectedTagIds;
-    const currentMode = mode ?? filterMode;
-    setIsLoadingUrls(true);
-    try {
-      const response = await api.myUrls.list(page, PAGE_SIZE, ids, currentMode);
-      setUrls(response.urls);
-      setTotalPages(Number(response.totalPages));
-      setCurrentPage(Number(response.currentPage));
-    } catch (error) {
-      toast.error("URL 목록을 불러오는데 실패했습니다.");
-      console.error("Failed to load URLs:", error);
-    } finally {
-      setIsLoadingUrls(false);
-    }
-  };
+  // URL list query
+  const {
+    data: urlsData,
+    isLoading: isLoadingUrls,
+  } = useMyUrlsList({
+    page: currentPage,
+    size: PAGE_SIZE,
+    tagIds: selectedTagIds,
+    filterMode,
+  });
 
-  // Load all tags
-  const loadTags = async () => {
-    try {
-      const response = await api.tags.list();
-      setAllTags(response.tags);
-    } catch (error) {
-      console.error("Failed to load tags:", error);
-    }
-  };
+  const urls = useMemo(() => urlsData?.urls ?? [], [urlsData?.urls]);
+  const totalPages = urlsData?.totalPages ?? 0;
 
-  // Load data after authentication
-  useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      loadUrls(0);
-      loadTags();
-    }
-  }, [authLoading, isAuthenticated]);
+  // Mutations
+  const deleteUrl = useDeleteUrl();
+  const updateDescription = useUpdateDescription();
 
   // Find URL to delete
   const deletingUrl = useMemo(
@@ -89,10 +71,7 @@ export default function MyUrlsPage() {
 
   const handleEdit = async (id: string, description: string) => {
     try {
-      await api.myUrls.updateDescription(id, description);
-      setUrls((prevUrls) =>
-        prevUrls.map((url) => (url.id === id ? { ...url, description } : url))
-      );
+      await updateDescription.mutateAsync({ urlId: id, description });
       toast.success("Description updated!");
     } catch (error) {
       toast.error("Failed to update description. Please try again.");
@@ -106,11 +85,9 @@ export default function MyUrlsPage() {
 
   const confirmDelete = async () => {
     if (!deletingId) return;
-
     try {
-      await api.myUrls.delete(deletingId);
+      await deleteUrl.mutateAsync(deletingId);
       setDeletingId(null);
-      loadUrls(currentPage, selectedTagIds, filterMode);
       toast.success("URL deleted successfully!");
     } catch (error) {
       toast.error("Failed to delete URL. Please try again.");
@@ -121,7 +98,7 @@ export default function MyUrlsPage() {
 
   const handlePageChange = (page: number) => {
     // shadcn Pagination is 1-based, backend is 0-based
-    loadUrls(page - 1, selectedTagIds, filterMode);
+    setCurrentPage(page - 1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -130,81 +107,21 @@ export default function MyUrlsPage() {
       ? selectedTagIds.filter((id) => id !== tagId)
       : [...selectedTagIds, tagId];
     setSelectedTagIds(newIds);
-    loadUrls(0, newIds, filterMode);
+    setCurrentPage(0);
   };
 
   const handleTagFilterClear = () => {
     setSelectedTagIds([]);
-    loadUrls(0, [], filterMode);
+    setCurrentPage(0);
   };
 
   const handleModeChange = (mode: TagFilterMode) => {
     setFilterMode(mode);
-    if (selectedTagIds.length > 0) {
-      loadUrls(0, selectedTagIds, mode);
-    }
+    setCurrentPage(0);
   };
 
   const handleAddUrl = () => {
-    loadUrls(0, selectedTagIds, filterMode);
     toast.success("URL added successfully!");
-  };
-
-  const handleTagAssign = (urlId: string, tagId: string) => {
-    const tag = allTags.find((t) => t.id === tagId);
-    if (!tag) return;
-    setUrls((prevUrls) =>
-      prevUrls.map((url) => {
-        if (url.id !== urlId) return url;
-        const already = (url.tags || []).some((t) => t.id === tagId);
-        if (already) return url;
-        return { ...url, tags: [...(url.tags || []), tag] };
-      })
-    );
-  };
-
-  const handleTagUnassign = (urlId: string, tagId: string) => {
-    setUrls((prevUrls) =>
-      prevUrls.map((url) => {
-        if (url.id !== urlId) return url;
-        return { ...url, tags: (url.tags || []).filter((t) => t.id !== tagId) };
-      })
-    );
-  };
-
-  const handleTagCreated = (tag: TagItem) => {
-    setAllTags((prev) => {
-      const exists = prev.some((t) => t.id === tag.id);
-      if (exists) return prev;
-      return [...prev, tag];
-    });
-  };
-
-  const handleTagDeleted = (tagId: string) => {
-    setAllTags((prev) => prev.filter((t) => t.id !== tagId));
-    setUrls((prevUrls) =>
-      prevUrls.map((url) => ({
-        ...url,
-        tags: (url.tags || []).filter((t) => t.id !== tagId),
-      }))
-    );
-    const newSelected = selectedTagIds.filter((id) => id !== tagId);
-    if (newSelected.length !== selectedTagIds.length) {
-      setSelectedTagIds(newSelected);
-      loadUrls(0, newSelected, filterMode);
-    }
-  };
-
-  const handleTagRenamed = (tagId: string, name: string) => {
-    setAllTags((prev) =>
-      prev.map((t) => (t.id === tagId ? { ...t, name } : t))
-    );
-    setUrls((prevUrls) =>
-      prevUrls.map((url) => ({
-        ...url,
-        tags: (url.tags || []).map((t) => (t.id === tagId ? { ...t, name } : t)),
-      }))
-    );
   };
 
   return (
@@ -212,15 +129,11 @@ export default function MyUrlsPage() {
       <MyUrlsPageHeader onAddUrl={handleAddUrl} />
 
       <TagFilter
-        allTags={allTags}
         selectedTagIds={selectedTagIds}
         filterMode={filterMode}
         onToggle={handleTagFilterToggle}
         onClear={handleTagFilterClear}
         onModeChange={handleModeChange}
-        onTagDeleted={handleTagDeleted}
-        onTagRenamed={handleTagRenamed}
-        onTagCreated={handleTagCreated}
       />
 
       {isLoadingUrls ? (
@@ -236,10 +149,6 @@ export default function MyUrlsPage() {
             onCopy={handleCopy}
             onEdit={handleEdit}
             onDelete={handleDelete}
-            allTags={allTags}
-            onTagAssign={handleTagAssign}
-            onTagUnassign={handleTagUnassign}
-            onTagCreated={handleTagCreated}
           />
           {totalPages > 1 && (
             <Pagination

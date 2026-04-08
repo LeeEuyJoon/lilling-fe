@@ -4,34 +4,30 @@ import { useState, useRef, useEffect } from "react";
 import { Plus, Tag } from "lucide-react";
 import { Input } from "@/components/shadcn/input";
 import { type TagItem } from "@/lib/api";
-import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { getTagColor } from "./tagColors";
+import { useTagsList, useCreateTag, useAssignTag, useUnassignTag } from "@/lib/queries/tag.queries";
 
 interface TagSelectorProps {
   urlId: string;
-  allTags: TagItem[];
   assignedTagIds: Set<string>;
-  onTagAssign: (urlId: string, tagId: string) => void;
-  onTagUnassign: (urlId: string, tagId: string) => void;
-  onTagCreated: (tag: TagItem) => void;
   hasAssignedTags: boolean;
 }
 
 export default function TagSelector({
   urlId,
-  allTags,
   assignedTagIds,
-  onTagAssign,
-  onTagUnassign,
-  onTagCreated,
   hasAssignedTags,
 }: TagSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [newTagName, setNewTagName] = useState("");
-  const [isCreatingTag, setIsCreatingTag] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const plusButtonRef = useRef<HTMLButtonElement>(null);
+
+  const { data: allTags = [] } = useTagsList();
+  const createTag = useCreateTag();
+  const assignTag = useAssignTag();
+  const unassignTag = useUnassignTag();
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -56,15 +52,13 @@ export default function TagSelector({
   const handleTagToggle = async (tag: TagItem) => {
     if (assignedTagIds.has(tag.id)) {
       try {
-        await api.tags.unassign(urlId, [tag.id]);
-        onTagUnassign(urlId, tag.id);
+        await unassignTag.mutateAsync({ urlId, tagIds: [tag.id] });
       } catch {
         toast.error("태그를 해제하는데 실패했습니다.");
       }
     } else {
       try {
-        await api.tags.assign(urlId, [tag.id]);
-        onTagAssign(urlId, tag.id);
+        await assignTag.mutateAsync({ urlId, tagIds: [tag.id] });
       } catch {
         toast.error("태그를 할당하는데 실패했습니다.");
       }
@@ -74,21 +68,16 @@ export default function TagSelector({
   const handleCreateTag = async () => {
     const trimmed = newTagName.trim();
     if (!trimmed) return;
-    if (isCreatingTag) return;
+    if (createTag.isPending) return;
 
-    setIsCreatingTag(true);
     try {
-      const created = await api.tags.create(trimmed);
-      onTagCreated(created);
+      const created = await createTag.mutateAsync(trimmed);
       // Assign the new tag to this URL immediately
-      await api.tags.assign(urlId, [created.id]);
-      onTagAssign(urlId, created.id);
+      await assignTag.mutateAsync({ urlId, tagIds: [created.id] });
       setNewTagName("");
       toast.success(`태그 "${created.name}"이 생성되었습니다.`);
     } catch {
       toast.error("태그 생성에 실패했습니다.");
-    } finally {
-      setIsCreatingTag(false);
     }
   };
 
@@ -189,7 +178,7 @@ export default function TagSelector({
             />
             <button
               onClick={handleCreateTag}
-              disabled={!newTagName.trim() || isCreatingTag}
+              disabled={!newTagName.trim() || createTag.isPending}
               className="shrink-0 p-1.5 rounded-lg transition-colors
                 text-neutral-400 hover:text-violet-600 hover:bg-violet-50
                 dark:text-white/40 dark:hover:text-violet-400 dark:hover:bg-violet-500/15

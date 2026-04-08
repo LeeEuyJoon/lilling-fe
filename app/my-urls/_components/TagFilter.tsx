@@ -4,42 +4,37 @@ import { useState, useRef, useEffect } from "react";
 import { Filter, X, ChevronDown, ChevronUp, MoreHorizontal, Pencil, Trash2, Plus } from "lucide-react";
 import { Input } from "@/components/shadcn/input";
 import { type TagItem } from "@/lib/api";
-import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { getTagColor } from "./tagColors";
+import { useTagsList, useCreateTag, useDeleteTag, useUpdateTag } from "@/lib/queries/tag.queries";
 
 export type TagFilterMode = "or" | "and";
 
 interface TagFilterProps {
-  allTags: TagItem[];
   selectedTagIds: string[];
   filterMode: TagFilterMode;
   onToggle: (tagId: string) => void;
   onClear: () => void;
   onModeChange: (mode: TagFilterMode) => void;
-  onTagDeleted: (tagId: string) => void;
-  onTagRenamed: (tagId: string, name: string) => void;
-  onTagCreated: (tag: TagItem) => void;
 }
 
 function TagChip({
   tag,
   isSelected,
   onToggle,
-  onTagDeleted,
-  onTagRenamed,
 }: {
   tag: TagItem;
   isSelected: boolean;
   onToggle: (id: string) => void;
-  onTagDeleted: (id: string) => void;
-  onTagRenamed: (id: string, name: string) => void;
 }) {
   const [isManageOpen, setIsManageOpen] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState("");
   const chipRef = useRef<HTMLDivElement>(null);
   const color = getTagColor(tag.id);
+
+  const deleteTag = useDeleteTag();
+  const updateTag = useUpdateTag();
 
   useEffect(() => {
     if (!isManageOpen) return;
@@ -62,8 +57,7 @@ function TagChip({
       return;
     }
     try {
-      await api.tags.update(tag.id, trimmed);
-      onTagRenamed(tag.id, trimmed);
+      await updateTag.mutateAsync({ tagId: tag.id, name: trimmed });
       setIsRenaming(false);
       setIsManageOpen(false);
       toast.success("태그 이름이 변경되었습니다.");
@@ -74,8 +68,7 @@ function TagChip({
 
   const handleDelete = async () => {
     try {
-      await api.tags.delete(tag.id);
-      onTagDeleted(tag.id);
+      await deleteTag.mutateAsync(tag.id);
       setIsManageOpen(false);
       toast.success("태그가 삭제되었습니다.");
     } catch {
@@ -170,35 +163,29 @@ function TagChip({
 }
 
 export default function TagFilter({
-  allTags,
   selectedTagIds,
   filterMode,
   onToggle,
   onClear,
   onModeChange,
-  onTagDeleted,
-  onTagRenamed,
-  onTagCreated,
 }: TagFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [newTagName, setNewTagName] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
+
+  const { data: allTags = [] } = useTagsList();
+  const createTag = useCreateTag();
 
   const handleCreateTag = async () => {
     const trimmed = newTagName.trim();
-    if (!trimmed || isCreating) return;
-    setIsCreating(true);
+    if (!trimmed || createTag.isPending) return;
     try {
-      const created = await api.tags.create(trimmed);
-      onTagCreated(created);
+      const created = await createTag.mutateAsync(trimmed);
       setNewTagName("");
       setIsAddingTag(false);
       toast.success(`태그 "${created.name}"이 생성되었습니다.`);
     } catch {
       toast.error("태그 생성에 실패했습니다.");
-    } finally {
-      setIsCreating(false);
     }
   };
 
@@ -246,8 +233,6 @@ export default function TagFilter({
                 tag={tag}
                 isSelected={selectedTagIds.includes(tag.id)}
                 onToggle={onToggle}
-                onTagDeleted={onTagDeleted}
-                onTagRenamed={onTagRenamed}
               />
             ))}
 
@@ -277,7 +262,7 @@ export default function TagFilter({
                 />
                 <button
                   onClick={handleCreateTag}
-                  disabled={!newTagName.trim() || isCreating}
+                  disabled={!newTagName.trim() || createTag.isPending}
                   className="p-1 rounded-md text-neutral-400 hover:text-violet-600 hover:bg-violet-50
                     dark:text-white/40 dark:hover:text-violet-400 dark:hover:bg-violet-500/15
                     disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
