@@ -5,11 +5,7 @@ import { useState } from "react";
 import AddExistingUrlModal from "./AddExistingUrlModal";
 import CreateUrlModal from "./CreateUrlModal";
 
-interface MyUrlsActionsProps {
-  onAddUrl: () => void;
-}
-
-export default function MyUrlsActions({ onAddUrl }: MyUrlsActionsProps) {
+export default function MyUrlsActions() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAddExistingModalOpen, setIsAddExistingModalOpen] = useState(false);
 
@@ -37,12 +33,10 @@ export default function MyUrlsActions({ onAddUrl }: MyUrlsActionsProps) {
       <CreateUrlModal
         open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
-        onSuccess={onAddUrl}
       />
       <AddExistingUrlModal
         open={isAddExistingModalOpen}
         onOpenChange={setIsAddExistingModalOpen}
-        onAdd={onAddUrl}
       />
     </>
   );

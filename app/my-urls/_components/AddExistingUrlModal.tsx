@@ -15,6 +15,7 @@ import {
 import { useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import { useClaimUrl } from "@/lib/queries/url.queries";
 
 type VerificationState =
   | "idle"
@@ -32,14 +33,13 @@ interface VerifiedUrlInfo {
 interface AddExistingUrlModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAdd: () => void;
 }
 
 export default function AddExistingUrlModal({
   open,
   onOpenChange,
-  onAdd,
 }: AddExistingUrlModalProps) {
+  const claimUrl = useClaimUrl();
   const [shortCode, setShortCode] = useState("");
   const [verificationState, setVerificationState] =
     useState<VerificationState>("idle");
@@ -89,9 +89,8 @@ export default function AddExistingUrlModal({
     setVerificationState("claiming");
 
     try {
-      await api.myUrls.claim(shortCode);
+      await claimUrl.mutateAsync(shortCode);
       toast.success("URL claimed successfully!");
-      onAdd();
       handleClose();
     } catch (error) {
       toast.error("Failed to claim URL. Please try again.");

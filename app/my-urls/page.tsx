@@ -120,13 +120,9 @@ export default function MyUrlsPage() {
     setCurrentPage(0);
   };
 
-  const handleAddUrl = () => {
-    toast.success("URL added successfully!");
-  };
-
   return (
     <main className="container mx-auto max-w-5xl p-4 sm:p-8">
-      <MyUrlsPageHeader onAddUrl={handleAddUrl} />
+      <MyUrlsPageHeader />
 
       <TagFilter
         selectedTagIds={selectedTagIds}

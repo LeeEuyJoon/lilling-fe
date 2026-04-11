@@ -7,15 +7,15 @@ import {
 import { Input } from "@/components/shadcn/input";
 import { Link2, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { api, ApiError } from "@/lib/api";
+import { ApiError } from "@/lib/api";
 import { toast } from "sonner";
+import { useCreateUrl } from "@/lib/queries/url.queries";
 import ResultDialog from "@/app/_components/ResultDialog";
 import KeywordInput from "@/app/_components/KeywordInput";
 
 interface CreateUrlModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
 }
 
 function getShortenErrorMessage(error: unknown): string {
@@ -39,30 +39,28 @@ function getShortenErrorMessage(error: unknown): string {
 export default function CreateUrlModal({
   open,
   onOpenChange,
-  onSuccess,
 }: CreateUrlModalProps) {
+  const createUrl = useCreateUrl();
   const [urlInput, setUrlInput] = useState("");
   const [keyword, setKeyword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [shortUrl, setShortUrl] = useState("");
   const [isResultOpen, setIsResultOpen] = useState(false);
 
   const handleShorten = async () => {
     if (!urlInput.trim()) return;
 
-    setIsLoading(true);
     try {
-      const response = await api.url.shorten(urlInput, keyword || undefined);
+      const response = await createUrl.mutateAsync({
+        originalUrl: urlInput,
+        keyword: keyword || undefined,
+      });
       setShortUrl(response.shortUrl);
       onOpenChange(false);
       setIsResultOpen(true);
-      onSuccess?.();
     } catch (error) {
       const message = getShortenErrorMessage(error);
       toast.error(message);
       console.error("Shorten error:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -94,18 +92,18 @@ export default function CreateUrlModal({
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && urlInput.trim() && !isLoading) {
+                  if (e.key === "Enter" && urlInput.trim() && !createUrl.isPending) {
                     handleShorten();
                   }
                 }}
                 className="pl-10 bg-neutral-50 border-neutral-200 dark:bg-white/5 dark:border-white/10 dark:text-violet-200 dark:placeholder:text-violet-400/50"
-                disabled={isLoading}
+                disabled={createUrl.isPending}
               />
             </div>
             <KeywordInput
               value={keyword}
               onChange={setKeyword}
-              disabled={isLoading}
+              disabled={createUrl.isPending}
               showIcon
               inputWrapperClassName="w-full sm:w-52"
               inputClassName="dark:bg-white/5 dark:border-white/10 dark:text-violet-200 dark:placeholder:text-violet-400/50"
@@ -116,7 +114,7 @@ export default function CreateUrlModal({
           <div className="px-4 sm:px-6 py-4 border-t border-neutral-100 dark:border-white/8 flex items-center justify-end gap-2">
             <button
               onClick={handleClose}
-              disabled={isLoading}
+              disabled={createUrl.isPending}
               className="text-sm font-semibold px-4 py-2 rounded-lg border transition-colors
                 border-neutral-300 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-800 hover:border-neutral-400
                 dark:border-white/10 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white/80 dark:hover:border-white/20"
@@ -125,12 +123,12 @@ export default function CreateUrlModal({
             </button>
             <button
               onClick={handleShorten}
-              disabled={!urlInput.trim() || isLoading}
+              disabled={!urlInput.trim() || createUrl.isPending}
               className="flex items-center gap-1.5 text-sm font-bold px-4 py-2 rounded-lg text-white transition-colors
                 bg-violet-600 hover:bg-violet-500 shadow-lg shadow-violet-900/30
                 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading && <Loader2 className="size-4 animate-spin" />}
+              {createUrl.isPending && <Loader2 className="size-4 animate-spin" />}
               Shorten URL
             </button>
           </div>

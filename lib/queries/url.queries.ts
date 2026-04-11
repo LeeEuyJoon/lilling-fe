@@ -63,3 +63,32 @@ export function useUpdateDescription() {
     },
   });
 }
+
+// ---------------------------------------------------------------------------
+// Create (shorten) URL
+// ---------------------------------------------------------------------------
+
+export function useCreateUrl() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ originalUrl, keyword }: { originalUrl: string; keyword?: string }) =>
+      api.url.shorten(originalUrl, keyword),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.myUrls.all });
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Claim existing URL
+// ---------------------------------------------------------------------------
+
+export function useClaimUrl() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (shortCode: string) => api.myUrls.claim(shortCode),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.myUrls.all });
+    },
+  });
+}
