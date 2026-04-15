@@ -3,6 +3,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@/components/shadcn/dialog";
 import { useState, ReactNode } from "react";
 import { Copy, Check } from "lucide-react";
@@ -38,7 +39,7 @@ export default function ResultDialog({
       >
         {/* Header */}
         <div className="px-6 pt-6 pb-4 border-b border-neutral-100 dark:border-white/8">
-          <h2 className="text-lg font-black text-neutral-900 dark:text-white">Your short URL is ready!</h2>
+          <DialogTitle className="text-lg font-black text-neutral-900 dark:text-white">Your short URL is ready!</DialogTitle>
           <p className="text-sm mt-0.5 text-neutral-500 dark:text-white/40">Copy and share it anywhere</p>
         </div>
 
