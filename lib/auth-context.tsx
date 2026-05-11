@@ -81,7 +81,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
-    // TODO: 백엔드 로그아웃 엔드포인트 추가 후 구현
     await api.auth.logout();
     setUser(null);
     // 홈페이지로 리다이렉트

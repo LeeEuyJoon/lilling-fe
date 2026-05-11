@@ -1,6 +1,21 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 /**
+ * Refresh token 중복 호출 방지를 위한 상태
+ * 여러 요청이 동시에 401을 받더라도 refresh는 한 번만 호출
+ */
+let refreshPromise: Promise<boolean> | null = null;
+
+/**
+ * Refresh 재시도를 건너뛰어야 하는 엔드포인트 목록 (무한 루프 방지)
+ */
+const NO_REFRESH_ENDPOINTS = [
+  "/api/v1/auth/refresh",
+  "/api/v1/auth/logout",
+  "/api/v1/auth/me",
+];
+
+/**
  * API 응답 타입 정의
  */
 export interface TagItem {
@@ -129,7 +144,59 @@ async function apiFetch<T>(
 
     // 401 Unauthorized인 경우
     if (response.status === 401) {
-      // auth context에 인증 실패 알림 (브라우저 환경에서만)
+      // refresh 재시도를 건너뛰어야 하는 엔드포인트는 바로 처리 (무한 루프 방지)
+      const skipRefresh = NO_REFRESH_ENDPOINTS.some((path) =>
+        endpoint.startsWith(path)
+      );
+
+      if (!skipRefresh && typeof window !== "undefined") {
+        // 이미 진행 중인 refresh가 있으면 재사용, 없으면 새로 시작
+        if (!refreshPromise) {
+          refreshPromise = fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+          })
+            .then((r) => r.ok)
+            .finally(() => {
+              refreshPromise = null;
+            });
+        }
+
+        const refreshed = await refreshPromise;
+
+        if (refreshed) {
+          // 토큰 갱신 성공 → 원래 요청 1회 재시도
+          const retryResponse = await fetch(url, {
+            ...options,
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              ...options?.headers,
+            },
+          });
+
+          if (retryResponse.status === 204) {
+            return {} as T;
+          }
+
+          if (!retryResponse.ok) {
+            const errorData: Partial<ApiErrorResponse> = await retryResponse
+              .json()
+              .catch(() => ({}));
+            throw new ApiError(
+              retryResponse.status,
+              retryResponse.statusText,
+              errorData.message || retryResponse.statusText,
+              errorData.code
+            );
+          }
+
+          return retryResponse.json();
+        }
+      }
+
+      // 갱신 실패 또는 skipRefresh인 경우 → 인증 실패 이벤트 dispatch
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("auth:unauthorized"));
       }
