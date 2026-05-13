@@ -12,7 +12,6 @@ let refreshPromise: Promise<boolean> | null = null;
 const NO_REFRESH_ENDPOINTS = [
   "/api/v1/auth/refresh",
   "/api/v1/auth/logout",
-  "/api/v1/auth/me",
 ];
 
 /**
