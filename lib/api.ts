@@ -215,6 +215,11 @@ async function apiFetch<T>(
       );
     }
 
+    const contentType = response.headers.get("content-type");
+    if (!contentType?.includes("application/json")) {
+      return {} as T;
+    }
+
     return response.json();
   } catch (error) {
     if (error instanceof ApiError) {
@@ -258,6 +263,23 @@ export const api = {
       } catch (error) {
         // 에러가 나더라도 계속 진행 (이미 로그아웃된 상태일 수 있음)
         console.error("Logout error:", error);
+      }
+    },
+
+    /**
+     * Access Token 갱신 (refresh_token 쿠키 사용)
+     * apiFetch를 거치지 않고 raw fetch 사용 (무한루프 방지)
+     */
+    refresh: async (): Promise<boolean> => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        });
+        return res.ok;
+      } catch {
+        return false;
       }
     },
   },

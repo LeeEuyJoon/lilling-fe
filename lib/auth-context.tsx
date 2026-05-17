@@ -14,40 +14,56 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [user, setUser] = useState<AuthMeResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const hasRedirected = useRef(false);
 
+  const handlePostLoginRedirect = async (response: AuthMeResponse) => {
+    if (response.isAuthenticated && !hasRedirected.current) {
+      const redirectUrl = localStorage.getItem("redirect_after_login");
+      const pendingClaimUrl = localStorage.getItem("pending_claim_url");
+
+      if (redirectUrl) {
+        hasRedirected.current = true;
+        localStorage.removeItem("redirect_after_login");
+
+        if (pendingClaimUrl) {
+          try {
+            await api.myUrls.claim(pendingClaimUrl);
+            localStorage.removeItem("pending_claim_url");
+          } catch (error) {
+            console.error("Error claiming URL:", error);
+          }
+        }
+
+        router.push(redirectUrl);
+      }
+    }
+  };
+
   const checkAuth = async () => {
     try {
       const response = await api.auth.me();
-      setUser(response);
 
-      // 로그인 후 리다이렉트 처리 (한 번만 실행)
-      if (response.isAuthenticated && !hasRedirected.current) {
-        const redirectUrl = localStorage.getItem("redirect_after_login");
-        const pendingClaimUrl = localStorage.getItem("pending_claim_url");
-
-        if (redirectUrl) {
-          hasRedirected.current = true;
-          localStorage.removeItem("redirect_after_login");
-
-          // pending claim이 있으면 먼저 처리
-          if (pendingClaimUrl) {
-            try {
-              await api.myUrls.claim(pendingClaimUrl);
-              localStorage.removeItem("pending_claim_url");
-            } catch (error) {
-              console.error("Error claiming URL:", error);
-            }
-          }
-
-          router.push(redirectUrl);
+      if (!response.isAuthenticated) {
+        // access_token 쿠키가 만료되어 브라우저가 삭제했을 수 있음
+        // refresh_token으로 갱신 시도
+        const refreshed = await api.auth.refresh();
+        if (refreshed) {
+          const retryResponse = await api.auth.me();
+          setUser(retryResponse);
+          await handlePostLoginRedirect(retryResponse);
+        } else {
+          setUser(response);
         }
+      } else {
+        setUser(response);
+        await handlePostLoginRedirect(response);
       }
-    } catch (error) {
+    } catch {
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -56,12 +72,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     checkAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 401 Unauthorized 이벤트 리스너 등록
   useEffect(() => {
     const handleUnauthorized = () => {
-      setUser(null); // 즉시 로그아웃 상태로 변경
+      setUser(null);
       setIsLoading(false);
     };
 
@@ -73,7 +90,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = (redirectTo?: string) => {
-    // 로그인 후 돌아갈 페이지를 localStorage에 저장
     if (redirectTo) {
       localStorage.setItem("redirect_after_login", redirectTo);
     }
@@ -82,9 +98,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     await api.auth.logout();
-    setUser(null);
-    // 홈페이지로 리다이렉트
-    window.location.href = "/";
+    setUser(null);       // React 상태 즉시 갱신 → Logout → Login 버튼 전환
+    router.push("/");    // 소프트 네비게이션 (window.location.href 대체)
   };
 
   const refreshAuth = async () => {
