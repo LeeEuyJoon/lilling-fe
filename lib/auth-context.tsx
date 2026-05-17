@@ -47,22 +47,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuth = async () => {
     try {
       const response = await api.auth.me();
-
-      if (!response.isAuthenticated) {
-        // access_token 쿠키가 만료되어 브라우저가 삭제했을 수 있음
-        // refresh_token으로 갱신 시도
-        const refreshed = await api.auth.refresh();
-        if (refreshed) {
-          const retryResponse = await api.auth.me();
-          setUser(retryResponse);
-          await handlePostLoginRedirect(retryResponse);
-        } else {
-          setUser(response);
-        }
-      } else {
-        setUser(response);
-        await handlePostLoginRedirect(response);
-      }
+      setUser(response);
+      await handlePostLoginRedirect(response);
     } catch {
       setUser(null);
     } finally {
