@@ -47,7 +47,7 @@ export default function UrlInfoCard({
   const getFaviconUrl = (urlString: string) => {
     try {
       const domain = new URL(urlString).hostname;
-      return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+      return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
     } catch {
       return "";
     }
@@ -94,9 +94,6 @@ export default function UrlInfoCard({
             src={getFaviconUrl(url.originalUrl)}
             alt="favicon"
             className="w-5 h-5"
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-            }}
           />
         </div>
 
