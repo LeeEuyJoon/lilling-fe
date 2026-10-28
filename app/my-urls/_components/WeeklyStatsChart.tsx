@@ -11,10 +11,12 @@ interface WeeklyStatsChartProps {
     date: string; // ISO date format (YYYY-MM-DD)
     clickCount: number;
   }>;
+  height?: number;
 }
 
 export default function WeeklyStatsChart({
   recentDailyStats,
+  height = 100,
 }: WeeklyStatsChartProps) {
   const [isDark, setIsDark] = useState(false);
 
@@ -76,7 +78,7 @@ export default function WeeklyStatsChart({
       strokeDashArray: 3,
       xaxis: { lines: { show: false } },
       yaxis: { lines: { show: true } },
-      padding: { top: -10, right: 10, bottom: 0, left: 10 },
+      padding: { top: 0, right: 10, bottom: 0, left: 10 },
     },
     tooltip: { enabled: false },
     dataLabels: { enabled: false },
@@ -84,7 +86,7 @@ export default function WeeklyStatsChart({
 
   return (
     <div className="w-full">
-      <Chart options={options} series={series} type="line" height={100} />
+      <Chart options={options} series={series} type="line" height={height} />
     </div>
   );
 }

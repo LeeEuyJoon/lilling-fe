@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import WeeklyStatsChart from "./WeeklyStatsChart";
 import { BarChart2, TrendingUp } from "lucide-react";
 import AnalyticsModal from "./AnalyticsModal";
@@ -16,7 +16,11 @@ interface WeeklyStatsCardProps {
     date: string;
     clickCount: number;
   }>;
+  cardHeight?: number;
 }
+
+// px-2 pt-1.5 pb-1의 상/하 패딩 합 (6px + 4px)
+const VERTICAL_PADDING = 10;
 
 export default function WeeklyStatsCard({
   urlId,
@@ -24,8 +28,26 @@ export default function WeeklyStatsCard({
   originalUrl,
   totalClickCount,
   recentDailyStats,
+  cardHeight,
 }: WeeklyStatsCardProps) {
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const titleRowRef = useRef<HTMLDivElement>(null);
+  const [titleHeight, setTitleHeight] = useState(20);
+
+  useLayoutEffect(() => {
+    const el = titleRowRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const h = entries[0]?.contentRect.height;
+      if (h) setTitleHeight(h);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const chartHeight = cardHeight
+    ? Math.max(60, cardHeight - titleHeight - VERTICAL_PADDING)
+    : 100;
 
   const { data: analyticsData, error } = useUrlAnalytics(urlId, showAnalytics);
 
@@ -44,10 +66,11 @@ export default function WeeklyStatsCard({
         className="w-full sm:w-56 sm:shrink-0 border rounded-xl px-2 pt-1.5 pb-1 flex flex-col gap-0 cursor-pointer group transition-colors min-h-0
           bg-neutral-50 border-neutral-200 hover:border-violet-300
           dark:bg-white/4 dark:border-white/8 dark:hover:border-violet-500/30"
+        style={cardHeight ? { height: cardHeight } : undefined}
         onClick={handleOpenAnalytics}
       >
         {/* Top row: click count + 통계 상세 보기 */}
-        <div className="flex items-center justify-between px-1">
+        <div ref={titleRowRef} className="flex items-center justify-between px-1">
           <div className="flex items-center gap-1 text-xs font-black text-violet-600 dark:text-violet-400">
             <BarChart2 size={12} />
             {totalClickCount}
@@ -59,7 +82,7 @@ export default function WeeklyStatsCard({
         </div>
 
         {/* Chart */}
-        <WeeklyStatsChart recentDailyStats={recentDailyStats} />
+        <WeeklyStatsChart recentDailyStats={recentDailyStats} height={chartHeight} />
       </div>
 
       <AnalyticsModal
