@@ -20,6 +20,7 @@ export default function UrlCard({
 }: UrlCardProps) {
   const infoRef = useRef<HTMLDivElement>(null);
   const [infoHeight, setInfoHeight] = useState<number>();
+  const [isDesktop, setIsDesktop] = useState(false);
 
   useLayoutEffect(() => {
     const el = infoRef.current;
@@ -32,6 +33,14 @@ export default function UrlCard({
     return () => observer.disconnect();
   }, []);
 
+  useLayoutEffect(() => {
+    const mql = window.matchMedia("(min-width: 640px)");
+    const update = () => setIsDesktop(mql.matches);
+    update();
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
+  }, []);
+
   return (
     <div
       className="border-2 border-violet-400 rounded-xl p-4 transition-all
@@ -41,7 +50,7 @@ export default function UrlCard({
       {/* Card body: left / right split */}
       <div className="flex flex-col sm:flex-row items-start gap-3">
         {/* Left: URL info */}
-        <div ref={infoRef} className="flex-1 min-w-0">
+        <div ref={infoRef} className="w-full flex-1 min-w-0">
           <UrlInfoCard
             url={url}
             onCopy={onCopy}
@@ -60,7 +69,7 @@ export default function UrlCard({
             originalUrl={url.originalUrl}
             totalClickCount={url.clickCount}
             recentDailyStats={url.recentDailyStats}
-            cardHeight={infoHeight}
+            cardHeight={isDesktop ? infoHeight : undefined}
           />
         )}
       </div>
